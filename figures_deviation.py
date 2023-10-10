@@ -1,98 +1,51 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-Created on Tue Aug 29 15:37:57 2023
+Plot the steady-state outputs deviation from default values as a function of the value chosen for Psupply. Create the figure 7 of the paper.
 
-@author: loms
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 import scienceplots
+
 plt.style.use(['science','no-latex'])
 plt.close('all')
 
-# Load the std_variations_abs data from the text files
+# Load the std_variations_abs data from the outputs_deviation.py code
 test_values = ['0.01', '0.096']
 variations = []
-
 for test in test_values:
     variations.append(np.loadtxt(f'sensitivity_variations_{test}.txt'))
-
-########### Absolute Deviation 
 
 plt.rc('font', size=10)
 fig, axs = plt.subplots(1, 2, figsize=(10, 5))
 plt.subplots_adjust(wspace=0, hspace=0)
 
-param_names2 = [r'$\mu^{max}_1$', r'$\mu^{max}_2$', r'$K^P_1$', r'$K^P_2$', r'$g^{max}_1$', r'$g^{max}_2$', r'$K^{Z}_1$', r'$K^{Z}_2$']
+param_names = [r'$\mu^{max}_1$', r'$\mu^{max}_2$', r'$K^P_1$', r'$K^P_2$', r'$g^{max}_1$', r'$g^{max}_2$', r'$K^{Z}_1$', r'$K^{Z}_2$']
 
-# Assuming you have test_values and variations defined before this loop
+# Loop on test values
 for i, test in enumerate(test_values):
-    
     variations_abs = variations[i]
     cax = axs[i].matshow(variations_abs, cmap='Spectral')
     axs[i].set_xticks(np.arange(5))
-    axs[i].set_yticks(np.arange(len(param_names2)))
+    axs[i].set_yticks(np.arange(len(param_names)))
     axs[i].set_xticklabels([r'$P_1$', r'$P_2$', r'$Z$', r'$PO4$', r'$R$'])
-    axs[i].set_yticklabels(param_names2)
+    axs[i].set_yticklabels(param_names)
     axs[i].xaxis.tick_bottom()
     axs[i].set_xlabel('State variable')
     axs[i].set_ylabel('Parameter')
     axs[i].set_title(rf'$\mathbf{{P_{{supply}} = {test}}}$', fontweight='bold', fontsize=12)
     
     if i == 0:
-        cbar = plt.colorbar(cax, ax=axs[i], label='Absolute Standard Deviation', 
+        cbar = plt.colorbar(cax, ax=axs[i], 
                             ticks=[-100, 0, 100], format='%.0f%%', extend='both')
         cax.set_clim(-100, 100)
     elif i == 1:
-        cbar = plt.colorbar(cax, ax=axs[i], label='Absolute Standard Deviation', 
+        cbar = plt.colorbar(cax, ax=axs[i], 
                             ticks=[-900, 0, 900], format='%.0f%%', extend='both')
         cax.set_clim(-900, 900)
     
     cbar.set_label('Absolute variation [%]', fontsize=10)
     
 plt.tight_layout()
-plt.savefig("../outputs/dev.pdf", format='pdf')
-plt.show()  # Optionally, display the plot
-
-############ DEVIATION 3
-variations = []
-for test in test_values:
-    variations.append(np.loadtxt(f'sensitivity_variations_dev3_{test}.txt'))
-
-############ Absolute Deviation 
-
-plt.rc('font', size=10)
-fig, axs = plt.subplots(1, 2, figsize=(10, 5))
-plt.subplots_adjust(wspace=0, hspace=0)
-
-param_names2 = [r'$\mu^{max}_1$', r'$\mu^{max}_2$', r'$K^P_1$', r'$K^P_2$', r'$g^{max}_1$', r'$g^{max}_2$', r'$K^{Z}_1$', r'$K^{Z}_2$']
-
-# Assuming you have test_values and variations defined before this loop
-for i, test in enumerate(test_values):
-    
-    variations_abs = variations[i]
-    cax = axs[i].matshow(variations_abs, cmap='Spectral')
-    axs[i].set_xticks(np.arange(2))
-    axs[i].set_yticks(np.arange(len(param_names2)))
-    axs[i].set_xticklabels([r'$V$', r'$R$'])
-    axs[i].set_yticklabels(param_names2)
-    axs[i].xaxis.tick_bottom()
-    axs[i].set_xlabel('State variable')
-    axs[i].set_ylabel('Parameter')
-    axs[i].set_title(rf'$\mathbf{{P_{{supply}} = {test}}}$', fontweight='bold', fontsize=12)
-    
-    if i == 0:
-        cbar = plt.colorbar(cax, ax=axs[i], label='Absolute Standard Deviation', 
-                            ticks=[-30, 0, 30], format='%.0f%%', extend='both')
-        cax.set_clim(-30, 30)
-    elif i == 1:
-        cbar = plt.colorbar(cax, ax=axs[i], label='Absolute Standard Deviation', 
-                            ticks=[-400, 0, 400], format='%.0f%%', extend='both')
-        cax.set_clim(-400, 400)
-    
-    cbar.set_label('Absolute variation [%]', fontsize=10)
-    
-plt.tight_layout()
-plt.savefig("../outputs/dev3.pdf", format='pdf')
-plt.show()  # Optionally, display the plot
+plt.savefig("../figures/deviation.pdf", format='pdf')
+plt.show()

@@ -100,4 +100,4 @@ for i in range(3):
     
 plt.tight_layout()
 plt.show()
-plt.savefig('../outputs/dynamicaltest90d.pdf', format='pdf')
+plt.savefig('../figures/dynamicaltest90d.pdf', format='pdf')

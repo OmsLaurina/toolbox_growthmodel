@@ -26,7 +26,7 @@ l_param = np.linspace(min_param, max_param, n)
 grazing = "diffgrazing"
 
 # Figure 1 (figure 6 in article): Effect of Psupply on the R ratio and time trend for the two extreme Psupply values.
-name_pdf = "../outputs/figure_grazings.pdf"
+name_pdf = "../figures/steadystatetest.pdf"
 
 fig = plt.figure(figsize=(12,3))
 gs = GridSpec(1, 3, width_ratios=[1, 1, 1], wspace=0.3)
@@ -97,7 +97,7 @@ plt.show()
 # Figure 2 (figure 5 in article): Effect of Psupply on the R ratio and time trend for the two extreme Psupply values.
 plt.figure(2)
 plt.rc('font', size=7)
-name_pdf_monod = '../outputs/monod.pdf'
+name_pdf_monod = '../figures/monod.pdf'
 arg = {
     'umax1': 1.9872,
     'umax2': 2.7648,

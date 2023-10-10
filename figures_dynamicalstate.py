@@ -19,7 +19,7 @@ data1 = np.loadtxt('dynamicalstate_pulse1_b0.08_d90.txt')
 time_flux, P1, P2, Z, PO4, Psupply = data1.T
 
 plt.figure(1)
-name_pdf = '../outputs/dynamicalstate_temporalevolution_pulse1_b0.08_d90.pdf'
+name_pdf = '../figures/dynamicalstate_temporalevolution_pulse1_b0.08_d90.pdf'
 plt.rc('font', size=7) 
 plt.plot(time_flux,Psupply, label=r'$P_{supply}$', color="darkgray")
 plt.plot(time_flux, P1, label=r'$P_1$', color="chartreuse")
@@ -40,7 +40,7 @@ data2 = np.loadtxt('dynamicalstate_pulse2_b0.08_d90.txt')
 time_flux, P1, P2, Z, PO4, Psupply = data2.T
 
 plt.figure(2)
-name_pdf = '../outputs/dynamicalstate_temporalevolution_pulse2_b0.08_d90.pdf'
+name_pdf = '../figures/dynamicalstate_temporalevolution_pulse2_b0.08_d90.pdf'
 plt.rc('font', size=7) 
 plt.plot(time_flux,Psupply, label=r'$P_{supply}$', color="darkgray")
 plt.plot(time_flux, P1, label=r'$P_1$', color="chartreuse")
@@ -61,7 +61,7 @@ plt.figure(3)
 data3 = np.loadtxt('dynamicalstate_pulse3_b0.08_d90.txt')
 time_flux, P1, P2, Z, PO4, Psupply = data3.T
 
-name_pdf = '../outputs/dynamicalstate_temporalevolution_pulse3_b0.08_d90.pdf'
+name_pdf = '../figures/dynamicalstate_temporalevolution_pulse3_b0.08_d90.pdf'
 plt.rc('font', size=7) 
 plt.plot(time_flux,Psupply, label=r'$P_{supply}$', color="darkgray")
 plt.plot(time_flux, P1, label=r'$P_1$', color="chartreuse")

@@ -1,18 +1,9 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Oct  2 07:02:39 2023
-
-@author: loms
 """
 
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Aug 29 15:32:50 2023
+Calculate and record the steady-state outputs deviation from default values as a function of the value chosen for Psupply.
 
-@author: loms
 """
+
 import numpy as np
 import numpy as npy
 import matplotlib.pyplot as plt
@@ -22,16 +13,16 @@ import pandas as pd
 plt.style.use(['science','no-latex'])
 plt.close('all')
 
+# Define the set up
 dt = 0.1
 end_time = 2000
 time = npy.arange(0, end_time, dt)
-p = 0.01
+p = 0.096
 test=p
 Psupply = [p] * len(time)
-
 param_names = ['umax1', 'umax2', 'kP1', 'kP2', 'gmax1', 'gmax2', 'kZ1', 'kZ2']
 
-# Default values
+# Default values of parameters
 default_params = {
     'umax1': 1.9872,
     'umax2': 2.7648,
@@ -43,9 +34,10 @@ default_params = {
     'kZ2': 20,
 }
 
+# Choose the facteur of deviation
 tx = 2
 
-# Default value /tx
+#  Run 2: Default value /tx
 run2 = [
     default_params['umax1']/tx,  # umax1
     default_params['umax2']/tx,  # umax2
@@ -56,7 +48,6 @@ run2 = [
     default_params['kZ1']/tx,    # kZ1
     default_params['kZ2']/tx,    # kZ2
 ]
-
 params_run2 = {
     'umax1': run2[0],
     'umax2': run2[1],
@@ -68,7 +59,7 @@ params_run2 = {
     'kZ2': run2[7]
 }
 
-# Default value *tx
+# Run 3: Default value *tx
 run3 = [
     default_params['umax1']*tx,  # umax1
     default_params['umax2']*tx,  # umax2
@@ -79,7 +70,6 @@ run3 = [
     default_params['kZ1']*tx,    # kZ1
     default_params['kZ2']*tx,    # kZ2
 ]
-
 params_run3 = {
     'umax1': run3[0],
     'umax2': run3[1],
@@ -91,15 +81,19 @@ params_run3 = {
     'kZ2': run3[7]
 }
 
-fig, axs = plt.subplots(5, 1, figsize=(10, 15))
-custom_colors =['#FFB6C1', '#FFD700', '#98FB98', '#87CEEB', '#FFA07A', '#9370DB', '#90EE90', '#F0E68C']
 
+
+custom_colors =['#FFB6C1', '#FFD700', '#98FB98', '#87CEEB', '#FFA07A', '#9370DB', '#90EE90', '#F0E68C']
+fig, axs = plt.subplots(5, 1, figsize=(10, 15))
 variations = np.zeros((len(param_names),5))
+
+# Define a threshold to force values close to 0 to be equal to 0
+# Values greater than 0.002 are expected by the model. If they are lower, this means 0
 threshold = 10**(-2)
 
-# Boucle pour chaque paramètre
+# Loop on parameter values
 for i, param_name in enumerate(param_names):
-    # Création de paramètres modifiés pour run2 et run3
+    # Creating modified parameters for run2 and run3
     run2 = default_params.copy()
     run2[param_name] /= tx
 
@@ -114,36 +108,32 @@ for i, param_name in enumerate(param_names):
     R_run3 = np.array(P1_run3) / (np.array(P1_run3) + np.array(P2_run3))
     R_run2 = np.array(P1_run2) / (np.array(P1_run2) + np.array(P2_run2))
     
+    # Graphically check solutions for each state variable and parameter value
     color = custom_colors[i % len(custom_colors)]
     axs[0].plot(time, P1_run2, color=color)
     axs[0].plot(time, P1_run3, linestyle='dotted', color=color)
     axs[0].axhline(y=P1_default[-1], color='red', linestyle='--', label='Default')
     axs[0].set_title('P1')
-    # axs[0].legend()
     
     axs[1].plot(time, P2_run2, color=color)
     axs[1].plot(time, P2_run3,  linestyle='dotted',color=color)
     axs[1].axhline(y=P2_default[-1], color='red', linestyle='--', label='Default')
     axs[1].set_title('P2')
-    # axs[1].legend()
     
     axs[2].plot(time, Z_run2, label='Run2', color=color)
     axs[2].plot(time, Z_run3, label='Run3', linestyle='dotted',color=color)
     axs[2].axhline(y=Z_default[-1], color='red', linestyle='--', label='Default')
     axs[2].set_title('Z')
-    # axs[2].legend()
     
     axs[3].plot(time, PO4_run2, color=color)
     axs[3].plot(time, PO4_run3, linestyle='dotted',color=color)
     axs[3].axhline(y=PO4_default[-1], color='red', linestyle='--', label='Default')
     axs[3].set_title('PO4')
-    # axs[3].legend()
     
     axs[4].plot(time, R_run2, color=color)
     axs[4].plot(time, R_run3, linestyle='dotted',color=color)
     axs[4].axhline(y=R_default[-1], color='red', linestyle='--', label='Default')
     axs[4].set_title('R')
-    # axs[4].legend()
     
     # Get the default
     P1_default = np.mean(P1_default[-200:])
@@ -190,7 +180,5 @@ for i, param_name in enumerate(param_names):
 
 plt.subplots_adjust(hspace=0.5)
 plt.show()
-plt.savefig(f'../outputs/sensitivity_test_{p}.pdf', format='pdf')
-
-# Save data to a text file
+plt.savefig(f'../figures/sensitivity_test_{p}.pdf', format='pdf')
 np.savetxt(f'../outputs/sensitivity_variations_{test}.txt', variations, fmt='%.8f')

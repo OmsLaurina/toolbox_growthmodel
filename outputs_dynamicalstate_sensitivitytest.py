@@ -1,6 +1,6 @@
 """
 
-Calculate and record the dynaical-state outputs of the model as a function of a range of amplitude b.
+Calculate and record the dynamical-state outputs of the model as a function of a range of amplitude b.
 
 """
 

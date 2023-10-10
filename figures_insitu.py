@@ -1,45 +1,32 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-Created on Mon Sep 25 18:01:57 2023
 
-@author: loms
+Plot the in situ biomasses. Create the figure 2 of the paper and the left panel of the figure 9.
+
 """
 
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import ticker
-from matplotlib.cm import ScalarMappable
-from matplotlib.gridspec import GridSpec
-from matplotlib.ticker import MaxNLocator
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 import scienceplots
-from f_monod_hollingII import f_monod
+
 plt.style.use(['science','no-latex'])
 plt.close('all')
 
-fig = plt.figure(figsize=(8,4))
-
-prop_pico = np.loadtxt('../outputs/prop_pico.txt')
-prop_nano = np.loadtxt('../outputs/prop_nano.txt')
-prop_micro = np.loadtxt('../outputs/prop_micro.txt')
-
-pico = np.loadtxt('../outputs/picob.txt')
-nano = np.loadtxt('../outputs/nanob.txt')
-micro = np.loadtxt('../outputs/microb.txt')
-
+# Load data from outputs_insitu.py code
+pico = np.loadtxt('../outputs/pico.txt')
+nano = np.loadtxt('../outputs/nano.txt')
+micro = np.loadtxt('../outputs/micro.txt')
+lat = np.loadtxt('../outputs/lat.txt')
+lon = np.loadtxt('../outputs/lon.txt')
 f_BioM = np.loadtxt('../outputs/f_biomass.txt')
 f_biomass_syne,f_biomass_nano,f_biomass_micro = f_BioM.T
 
-lat = np.loadtxt('../outputs/lat.txt')
-lon = np.loadtxt('../outputs/lon.txt')
+# Figure 1 (figure 2 of the paper): Biomasses distribution
+fig = plt.figure(figsize=(8,4))
+ax1 = fig.add_subplot(1, 3, 1) # PICO
+ax2 = fig.add_subplot(1, 3, 2) # MICRO
+ax3 = fig.add_subplot(1, 3, 3) # NANO
 
-# Créez la deuxième ligne de sous-graphiques (scatter plots)
-ax1 = fig.add_subplot(1, 3, 1)
-ax2 = fig.add_subplot(1, 3, 2)
-ax3 = fig.add_subplot(1, 3, 3)
-
-# Premier sous-graphique (scatter plot) dans la deuxième ligne
 scatter1 = ax1.scatter(lon, lat, c=pico, cmap='viridis')
 ax1.set_title(r'$PICO$' + '\n$f_{BioM}=' + str(round(f_biomass_syne, 1)) + '$')
 ax1.set_xlabel('°E Longitude')
@@ -62,7 +49,6 @@ tick_locator = ticker.MaxNLocator(nbins=10)
 cbar2.locator = tick_locator
 cbar2.update_ticks()
 
-# Deuxième sous-graphique (scatter plot) dans la deuxième ligne
 scatter3 = ax3.scatter(lon, lat, c=nano, cmap='viridis')
 ax3.set_title(r'$NANO$' + '\n$f_{BioM}=' + str(round(f_biomass_nano, 1)) + '$')
 ax3.set_xlabel('°E Longitude')
@@ -76,21 +62,23 @@ cbar3.update_ticks()
 
 plt.tight_layout()
 plt.show()
-plt.savefig('insitu_comparaison.pdf', format='pdf')
+plt.savefig('../figures/insitu_biomasses.pdf', format='pdf')
 
-
+# Calculate the polynomial regression of the in situ R ratio (pico/mean(to))
 tot = np.loadtxt('../outputs/tot.txt')
 degree = 3
-coefficients = np.polyfit(lat, prop_pico/np.mean(tot), degree)
+coefficients = np.polyfit(lat, pico/np.mean(tot), degree)
 polynomial = np.poly1d(coefficients)
 x_fit = np.linspace(min(lat), max(lat), 1000)
 y_fit = polynomial(x_fit)
+
+# Figure 2 (figure 9 of the paper): R ratio as a function of the latitude
 plt.figure(2)
-plt.scatter(lat, prop_pico/np.mean(tot), c=tot, cmap='Wistia')
+plt.scatter(lat, pico/np.mean(tot), c=tot, cmap='Wistia')
 plt.plot(x_fit, y_fit, 'k-', label=f'Polynomial Fit (Degree {degree})')
 plt.axvline(x=38.5, color='red', linestyle='--',linewidth=2)
 plt.grid()
 plt.colorbar(label=r'${TotBioM}$ [mmolCm$^{-3}$]')
 plt.xlabel('°N Latitude', fontsize=10)
 plt.ylabel(r'$R_{in situ}$ []', fontsize=10)
-plt.savefig('ratioR_comparaison.pdf', format='pdf')
+plt.savefig('../figures/ratioR_latitude.pdf', format='pdf')
