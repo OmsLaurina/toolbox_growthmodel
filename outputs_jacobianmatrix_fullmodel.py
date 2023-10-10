@@ -7,26 +7,22 @@ Created on Fri Sep  1 09:36:07 2023
 """
 
 import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
 import numpy as npy
 import numpy as np
 from scipy.integrate import solve_ivp
-from scipy.optimize import fsolve
 import math
 import scienceplots
 import sys
 from growth_model_2P1Z_v10 import growth_model_2P1Z_v10 
 from growth_model_2P1Z_v10_RK45 import growth_model
+
 sys.path.append('../')
 plt.style.use(['science','no-latex'])
 plt.close('all')
 
-
-# Timestep (same than timestep of the growth function : by default is 0.2)
+# Define the set up
 dt = 0.1
-# Choose the time at which the simulation end (days)
 end_time = 2000
-# create a time vector from 0 to end_time, seperated by a timestep
 time = npy.arange(0,end_time,dt)
 Psupply_moy = 1
 p=0.01
@@ -60,19 +56,16 @@ arg = {
 
 [P1,P2,Z,PO4,arg]=growth_model_2P1Z_v10(Psupply, time, dt,P1_ini=0.6, P2_ini=0.1)
 
-print(P1[-1])
-print(P2[-1])
-
-n = 100 #number of value tested
-#name of the parameters in the model you want to study 
-param1 = 'psupp'
+# Number of value tested
+n = 100  
+param = 'psupp'
 # name for plot
-name_param1= r'$P_{\mathrm{supply}}$ [mmolCm$^{-3}d^{-1}$]'
+name_param= r'$P_{\mathrm{supply}}$ [mmolCm$^{-3}d^{-1}$]'
 
 #Tested range of values
-min_param1 = 0.01
-max_param1 = 0.12
-l_param1 = np.linspace(min_param1,max_param1,n)
+min_param = 0.01
+max_param = 0.12
+l_param = np.linspace(min_param,max_param,n)
 
 eigenvalues=[]
 real_parts_list=[]
@@ -80,11 +73,11 @@ max_real_parts = []
 
 i=0
 
-for param1 in l_param1:
+for param in l_param:
                                     
     a = arg['gamma']*(1-arg['epsilon2Z']*(1-arg['gamma']))
     b = -(1-arg['epsilon2Z']*(1-arg['gamma'])+arg['epsilon1Z']*arg['gamma'])*arg['m1Z']
-    c = arg['epsilon1Z']*arg['m1Z']**2-Psupply_moy*param1*arg['m2Z']
+    c = arg['epsilon1Z']*arg['m1Z']**2-Psupply_moy*param*arg['m2Z']
     
     delta = b**2-4*a*c
     x1 = (-b+math.sqrt(delta))/(2*a)
@@ -103,13 +96,13 @@ for param1 in l_param1:
         PO4_barre = arg['kP2']*(x1*Z_barre+arg['mP2']*P2_barre)/(arg['umax2']*P2_barre-(x1*Z_barre+arg['mP2']*P2_barre))
         
     if arg['P1_ini'] == 0.6 and arg['P2_ini'] == 0.1:
-        [P1,P2,Z,PO4,arg]=growth_model_2P1Z_v10(Psupply_arr*param1, time, dt,P1_ini=0.6, P2_ini=0.1)
+        [P1,P2,Z,PO4,arg]=growth_model_2P1Z_v10(Psupply_arr*param, time, dt,P1_ini=0.6, P2_ini=0.1)
         P1_barre = P1[-1]
         P2_barre = P2[-1]
         Z_barre = Z[-1]
         PO4_barre = PO4[-1]
     
-    # Matrice Jacobienne
+    # Jacobian matrix
     
     j11 = (arg['umax1'] * PO4_barre) / (PO4_barre + arg['kP1']) - (Z_barre * arg['gmax1'] * (P2_barre + arg['kZ1'])) / ((P1_barre + P2_barre + arg['kZ1'])**2) - arg['mP1']
     j12 = (Z_barre * arg['gmax1'] * P1_barre) / (P1_barre + P2_barre + arg['kZ1'])**2
@@ -139,38 +132,20 @@ for param1 in l_param1:
     real_parts_list.append(real_parts) 
     max_real_part = np.max(real_parts)
     max_real_parts.append(max_real_part)
-    t_res = 1/np.abs(max_real_part)
     
-    if np.all(real_parts < 0): #un modèle est stable si toutes les valeurs propres de la MJ sont de parties réelles < 0 
+    if np.all(real_parts < 0):
         print("Le modèle est stable")
     else:
         print("Le modèle est instable")
-    # print("Valeurs propres :", eigenvalues)
-    # print("Parties réelles :", real_parts)
     real_parts_matrix = np.vstack(real_parts_list)
-    # print("Matrice des parties réelles des valeurs propres :", real_parts_matrix)
     
     i=i+1
     print(i)
-    print(param1)
-    # print(max_real_part)
-    print(t_res)
+    
+np.savetxt('../outputs/real_parts2.txt', real_parts_matrix)
+np.savetxt('../outputs/max_real_parts2.txt', max_real_parts)
 
-""" Figures """
-
-plt.figure(2)
-boolean_values = np.all(real_parts_matrix < 0, axis=1)
-print(boolean_values)
-stable_color = 'black'
-instable_color = 'grey'
-plt.axhline(y=0, color='red', linestyle='--')
-plt.plot(l_param1, max_real_parts,'lightgray')
-plt.scatter(l_param1, max_real_parts, c=np.where(boolean_values, stable_color, instable_color), s=5)
-plt.xlabel(name_param1)
-plt.ylabel(r'$\lambda^{max}$')
-plt.savefig('diagrbifurc_complexemodel.pdf', format='pdf')
-
-#### Test si les solutions analytiques collent avec les solutions numériques 
+# Check if the solutions obtain with the jacobian matrix are in consistence with numerical solutions
 
 a = arg['gamma']*(1-arg['epsilon2Z']*(1-arg['gamma']))
 b = -(1-arg['epsilon2Z']*(1-arg['gamma'])+arg['epsilon1Z']*arg['gamma'])*arg['m1Z']
@@ -180,7 +155,6 @@ delta = b**2-4*a*c
 x1 = (-b+math.sqrt(delta))/(2*a)
 x2 =(-b-math.sqrt(delta))/(2*a)
 
-# Calcul des points d'équilibre
 if arg['P2_ini'] == 0: 
     P1_barre = x1*arg['kZ1']/(arg['gmax1']-x1)
     P2_barre = 0
@@ -212,7 +186,7 @@ plt.axhline(y=PO4_barre, color='magenta', linestyle='--')
 plt.axhline(y=Z_barre, color='aqua', linestyle='--')
 
 
-#### Test si les solutions analytiques collent avec les solutions numériques issus de la methode RK45
+# Check if the solutions obtain with the jacobian matrix are in consistence with numerical solutions from RK45
 
 P1_ini = arg['P1_ini']
 P2_ini = arg['P2_ini']
