@@ -2,7 +2,7 @@ Growth Model Toolbox for reproducing figures and analyses in L. Oms et al., 2023
 
 Detailed explanations of each code and directories below.
 
-~~~~~~~~~~~ CODES ~~~~~~~~~~~
+----------- CODES -----------
 
 All codes starting with 'outputs' generate the .txt files for the analyses, while the codes starting with 'figures' create the visual figures using the .txt files from each analysis.
 
