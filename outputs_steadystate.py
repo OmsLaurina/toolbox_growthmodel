@@ -1,54 +1,52 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-Created on Tue Aug 29 11:18:36 2023
 
-@author: loms
+Calculate and record the steady-state outputs of the model as a function of the value chosen for Psupply.
+
 """
 
 import numpy as np
-from growth_model_2P1Z_v10 import growth_model_2P1Z_v10
+from growth_model import growth_model
 
-# Set up
+# Define the set up
 dt = 0.1
 end_time = 2000
 time = np.arange(0, end_time, dt)
-Psupply_moy = 0.062
+Psupply_moy = 0.096
 Psupply = [Psupply_moy] * len(time)
 
+# For output file name (to save results obtained with different Psupply)
 test = Psupply_moy
 
 # Call the function
-[P1, P2, Z, PO4, arg] = growth_model_2P1Z_v10(Psupply, time, dt, P2_ini=0.6)
+[P1, P2, Z, PO4, arg] = growth_model(Psupply, time, dt)
 
-# # Save data to a text file
-# data_filename = f'../outputs/data_{test}.txt'
-# data = np.column_stack((time, P1, P2, Z, PO4))
-# np.savetxt(data_filename, data, header="Time P1 P2 Z PO4")
+#### Testing the importance of differential grazing #####
 
-# ##### FOR SCENARIOS #####
+grazing = 'nograzing'
 
-# grazing = 'nograzing'
+[P1, P2, Z, PO4, arg] = growth_model(Psupply, time, dt, gmax1=0, gmax2=0)
+data_filename = f'../outputs/steadystate_{grazing}_{test}.txt'
+data = np.column_stack((time, P1, P2, Z, PO4))
+np.savetxt(data_filename, data, header="Time P1 P2 Z PO4")
 
-# [P1, P2, Z, PO4, arg] = growth_model_2P1Z_v10(Psupply, time, gmax1=0, gmax2=0)
-# data_filename = f'../outputs/data_{grazing}_{test}.txt'
-# data = np.column_stack((time, P1, P2, Z, PO4))
-# # np.savetxt(data_filename, data, header="Time P1 P2 Z PO4")
+###
 
-# grazing = 'equalgrazing'
+grazing = 'equalgrazing'
 
-# [P1, P2, Z, PO4, arg] = growth_model_2P1Z_v10(Psupply, time, kZ2=5, gmax2=3.89)
-# data_filename = f'../outputs/data_{grazing}_{test}.txt'
-# data = np.column_stack((time, P1, P2, Z, PO4))
-# # np.savetxt(data_filename, data, header="Time P1 P2 Z PO4")
+[P1, P2, Z, PO4, arg] = growth_model(Psupply, time, dt, kZ2=5, gmax2=3.89)
+data_filename = f'../outputs/steadystate_{grazing}_{test}.txt'
+data = np.column_stack((time, P1, P2, Z, PO4))
+np.savetxt(data_filename, data, header="Time P1 P2 Z PO4")
+
+###
 
 grazing = 'diffgrazing'
 
-[P1, P2, Z, PO4, arg] = growth_model_2P1Z_v10(Psupply, time, dt)
+[P1, P2, Z, PO4, arg] = growth_model(Psupply, time, dt)
 prop_P1 = (P1[-1]/(P1[-1]+P2[-1]))*100
 prop_P2 =  (P2[-1]/(P1[-1]+P2[-1]))*100
 
-data_filename = f'../outputs/data_{test}.txt'
+data_filename = f'../outputs/steadystate_{grazing}_{test}.txt'
 data = np.column_stack((time, P1, P2, Z, PO4))
 np.savetxt(data_filename, data, header="Time P1 P2 Z PO4")
 

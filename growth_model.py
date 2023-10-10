@@ -1,34 +1,27 @@
 """
-        ----------- Growth_MODEL2P1Z_FROMPSUPPLY [mmolC/m^3] -----------
+        ----------- growthmodel [mmolC/m^3] -----------
 
- Growth-advection model by Messié & Chavez (2017), adapted to the Mediterranean sea.
+ Growth model by Messié & Chavez (2017), adapted to the Mediterranean sea.
 
- Call it as : [P1,P2,Z,PO4]=growth_model_2P1Z_v9(Psupply, time,**kwargs)
+ Call it as : [P1,P2,Z,PO4,arg]=growth_model_2P1Z_v9(Psupply, time, dt, **kwargs)
  
  Required inputs:
- 	'Psupply' expressed in mmolC/m3/d, all units are carbon-based.
-    'time' as npy.arange(0,end_time,dt) where dt is the time step and end_time the number of day
+ 	'Psupply' expressed in mmolC/m3/d, all units are carbon-based
+    'dt' time step
+    'time' as npy.arange(0,end_time,dt) where dt is the time step (above) and end_time the number of day
 
  Optional inputs:
      **kwargs parameters of models, initial conditions, timestep. Set by default here, but you can modify it as :
-      [P1,P2,Z,PO4]=growth_model_2P1Z_v9(Psupply, time, umax1=0.2) for exemple
+      [P1,P2,Z,PO4,arg]=growth_model_2P1Z_v9(Psupply, time, dt, umax1=0.2) for example
 
- Monique Messié, 2021 for public version
- Reference: Messié, M., & Chavez, F. P. (2017). PO4rient supply, surface currents, and plankton dynamics predict zooplankton hotspots 
+ *nom du papier une fois publié* for public version
+ 
+ Reference: Messié, M., & Chavez, F. P. (2017). nutrient supply, surface currents, and plankton dynamics predict zooplankton hotspots 
 					in coastal upwelling systems. Geophysical Research Letters, 44(17), 8979-8986, https://doi.org/10.1002/2017GL074322
-                    
- Differences with Messié and Chavez (2021):
-	   Nutrient supply is Phosphate instead Nitrate
-	   One nutrient compartiment
-       One zooplankton compartiment
-       Assimilation coefficient gamma = %  of conversion from P to Z
-       
-  P1 = Small phytoplankton (SYNECO, PICO) < 2um
-  P2 = Big phytoplankton (MICRO) >20um
   
 """
 
-def growth_model_2P1Z_v10(Psupply,time, dt,**kwargs):
+def growth_model(Psupply,time, dt, **kwargs):
     print("Current parameter values:")
     for param_name, param_value in kwargs.items():
         print(f"  {param_name}: {param_value}")
@@ -40,47 +33,47 @@ def growth_model_2P1Z_v10(Psupply,time, dt,**kwargs):
     
     ##Creating empty vectors
     
-    # growth rates [d^-1]
+    # Growth rates [d^-1]
     u1=[]
     u2=[]		
     # grazing rates [d^-1]
     g1=[]
     g2=[]	
 			
-    #Primary production [mmolC^{-1} m^{3} d^{-1}]
+    # Primary production [mmolC^{-1} m^{3} d^{-1}]
     PP1=[]
     PP2=[]
     
-    #grazing [mmolC^{-1} m^{3} d^{-1}]
+    # Grazing [mmolC^{-1} m^{3} d^{-1}]
     G1=[]
     G2=[]
     
-    #excretion [mmolC^{-1} m^{3} d^{-1}]
+    # Excretion [mmolC^{-1} m^{3} d^{-1}]
     exc=[]
     
-    #death [mmolC^{-1} m^{3} d^{-1}]
-    #Natural mortality
+    # Death [mmolC^{-1} m^{3} d^{-1}]
+    ## Natural mortality
     d_P1 = []
     d_P2 = []
     d1_Z=[]
-    #High trophic level mortality 
+    
+    ## High trophic level mortality 
     d2_Z = []
     
-    #recycling
+    # Recycling
     rec_P1 = []
     rec_P2 = []
     rec_Z = []
     rec_exc = []
     
-    #Washout (biomass out of the system) [mmolC^{-1} m^{3} d^{-1}]
+    # Washout (biomass out of the system) [mmolC^{-1} m^{3} d^{-1}]
     w_P1 = []
     w_P2 = []
     w1_Z = []
     w2_Z = []
-    
     Export=[]
     
-    # biomass of Phytoplankton, Zooplankton and PO4 [mmolC/m³]
+    # Biomass of Phytoplankton, Zooplankton and PO4 [mmolC/m³]
     P1=[] 			
     P2=[] 						
     Z = []
@@ -113,27 +106,24 @@ def growth_model_2P1Z_v10(Psupply,time, dt,**kwargs):
     
     arg = { **defaultKwargs, **kwargs}
     
-    dt=dt
-    
     # Initial conditions at time=0			
     P1.append(arg['P1_ini'])
     P2.append(arg['P2_ini'])
     Z.append(arg['Z_ini'])
     PO4.append(arg['PO4_ini'])
     
-    
     nb_time=len(time)
     
     for t in range(0,nb_time-1):
 
-        # growth rates (monod function)
+        # GROWTH RATE (monod function)
         u1next=PO4[t-1]/(arg['kP1']+PO4[t-1])*arg['umax1']
         u2next=PO4[t-1]/(arg['kP2']+PO4[t-1])*arg['umax2']
        
         u1.append(u1next)
         u2.append(u2next)
         
-        # functional response = grazing rates (holling type II)
+        # GRAZING RATE (holling type II)
         g1next=P1[t-1]/(arg['kZ1']+P1[t-1]+P2[t-1])*arg['gmax1']
         g2next=P2[t-1]/(arg['kZ2']+P1[t-1]+P2[t-1])*arg['gmax2']
        
@@ -141,7 +131,6 @@ def growth_model_2P1Z_v10(Psupply,time, dt,**kwargs):
         g2.append(g2next)
    
    	    # FLUXES
-          
         # UPTAKE (PRIMARY PRODUCTION)
         PP1next=u1[t]*P1[t-1]
         PP2next=u2[t]*P2[t-1]
@@ -183,9 +172,7 @@ def growth_model_2P1Z_v10(Psupply,time, dt,**kwargs):
         rec_Z.append(rec_Znext)
         rec_exc.append(rec_excnext)
         
-        #WASHOUT
-        #eps = Psupply[t]/(arg['m1Z']*Z[t-1])
-        
+        # WASHOUT
         w_P1next = (1-arg['epsilonP'])*d_P1[t]
         w_P2next = (1-arg['epsilonP'])*d_P2[t]
         w1_Znext = (1-arg['epsilon1Z'])*d1_Z[t]
@@ -200,7 +187,7 @@ def growth_model_2P1Z_v10(Psupply,time, dt,**kwargs):
         
         Export.append(Exportnext)
     
-        #P1 puise en premier dans le pool de nutriments
+        #P1 draws first from nutrient pool
         max_available_PO4 = PO4[t-1]+Psupply[t]*dt+rec_P1[t]*dt+rec_P2[t]*dt+rec_Z[t]*dt+rec_exc[t]*dt
        
         if PP1[t]>max_available_PO4/dt:
@@ -212,20 +199,12 @@ def growth_model_2P1Z_v10(Psupply,time, dt,**kwargs):
         
         # BIOMASS
         P1_next=P1[t-1]+PP1[t]*dt-G1[t]*dt-d_P1[t]*dt
-        # if P1_next<=0:
-        #     P1_next=0
         
         P2_next=P2[t-1]+PP2[t]*dt-G2[t]*dt-d_P2[t]*dt
-        if P2_next<=0:
-            P2_next=0
             
         Z_next=Z[t-1]+arg['gamma']*G1[t]*dt+arg['gamma']*G2[t]*dt-d1_Z[t]*dt-d2_Z[t]*dt
-        # if Z_next<=0:
-        #     Z_next=0
             
         PO4_next=PO4[t-1]+Psupply[t]*dt+rec_P1[t]*dt+rec_P2[t]*dt+rec_Z[t]*dt+rec_exc[t]*dt-PP1[t]*dt-PP2[t]*dt
-        # if PO4_next<=0:
-        #     PO4_next=0
         
         P1.append(P1_next)
         P2.append(P2_next)
