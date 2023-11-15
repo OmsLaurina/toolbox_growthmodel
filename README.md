@@ -24,7 +24,8 @@ figures_dynamical_state_sensitivitytest.py: Plots the steady-state outputs over 
 outputs_deviation.py: Calculates the sensitivity of the state variable to the model parameter values.
 figures_deviation.py: Plots the sensitivity of the state variable to the model parameter values. Reproduces Fig. 7.
 
-outputs_insitu.py: Calculates the in situ regrouped biomasses and the f_BioM ratio.
+outputs_biomasses.py: Calculates the in situ biomasses with the method of Menden-Deurer and Lessard (2000).
+outputs_biomasses2.py: Regroupes the 9 phytoplanktons groups into 3 size groups and calculates the f_biom.
 figures_insitu.py: Plots the in situ regrouped biomasses. Reproduces Fig. 2 and Fig. 9 (left part).
 
 outputs_jacobianmatrix_fullmodel.py: Calculates the Jacobian matrix of the full model from the numerical solutions.
