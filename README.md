@@ -6,8 +6,8 @@ Detailed explanations of each code and directories below.
 
 All codes starting with 'outputs' generate the .txt files for the analyses, while the codes starting with 'figures' create the visual figures using the .txt files from each analysis.
 
-growth_model.py: Function defining the full model (Explicit Euler method).
-growth_model_simplify.py: Function defining the simplified model (Explicit Euler method).
+* growth_model.py: Function defining the full model (Explicit Euler method).
+* growth_model_simplify.py: Function defining the simplified model (Explicit Euler method).
 
 outputs_steady_state.py: Calculates the steady-state outputs for a chosen value of Psupply.
 figures_steady_state.py: Plots the steady-state outputs over time for a chosen value of Psupply.
