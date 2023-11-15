@@ -22,6 +22,7 @@
 """
 
 def growth_model(Psupply,time, dt, **kwargs):
+    
     print("Current parameter values:")
     for param_name, param_value in kwargs.items():
         print(f"  {param_name}: {param_value}")
@@ -147,7 +148,6 @@ def growth_model(Psupply,time, dt, **kwargs):
         
         # EXCRETION
         excnext=(1-arg['gamma'])*g1[t]*Z[t-1]+(1-arg['gamma'])*g2[t]*Z[t-1]
-        
         exc.append(excnext)
         
         # MORTALITY
@@ -184,7 +184,6 @@ def growth_model(Psupply,time, dt, **kwargs):
         w2_Z.append(w2_Znext)
         
         Exportnext = w_P1[t]+w_P2[t]+w1_Z[t]+w2_Z[t]+d2_Z[t]
-        
         Export.append(Exportnext)
     
         #P1 draws first from nutrient pool

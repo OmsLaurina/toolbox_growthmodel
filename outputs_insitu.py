@@ -3,31 +3,40 @@
 Record the in situ biomasses and calculate the fbioM ratio. 
 
 """
-
 import numpy as np
-import matplotlib.pyplot as plt
 
-# Load data from the BioSWOTmed_data directory
-biom_Syne = np.loadtxt('../BioSWOTmed_data/SYNE.txt')
-biom_Micro = np.loadtxt('../BioSWOTmed_data/MICRO.txt')
-biom_PICO1 = np.loadtxt('../BioSWOTmed_data/PICO1.txt')
-biom_PICO2 = np.loadtxt('../BioSWOTmed_data/PICO2.txt')
-biom_PICO3 = np.loadtxt('../BioSWOTmed_data/PICO3.txt')
-biom_NANOred = np.loadtxt('../BioSWOTmed_data/NANOred.txt')
-biom_NANOsws = np.loadtxt('../BioSWOTmed_data/NANOsws.txt')
-biom_PICOHFLR = np.loadtxt('../BioSWOTmed_data/PICOHFLR.txt')
-lat = np.loadtxt('../BioSWOTmed_data/lat.txt')
+# Load data from the outputs directory
+biom_Syne = np.loadtxt('../outputs/SYNE.txt')
+biom_Micro = np.loadtxt('../outputs/MICRO.txt')
+biom_PICO1 = np.loadtxt('../outputs/PICO1.txt')
+biom_PICO2 = np.loadtxt('../outputs/PICO2.txt')
+biom_PICO3 = np.loadtxt('../outputs/PICO3.txt')
+biom_NANOred = np.loadtxt('../outputs/NANOred.txt')
+biom_NANOsws = np.loadtxt('../outputs/NANOsws.txt')
+biom_PICOHFLR = np.loadtxt('../outputs/PICOHFLR.txt')
+biom_CRYPTO = np.loadtxt('../outputs/CRYPTO.txt')
+lat = np.loadtxt('../outputs/lat.txt')
+lon = np.loadtxt('../outputs/lon.txt')
 
 # Calculate and record the regrouped biomasses
-tot = biom_Syne+biom_Micro+biom_NANOred+biom_NANOsws+biom_PICO1+biom_PICO3+biom_PICO2+biom_PICOHFLR
+tot = biom_Syne+biom_Micro+biom_NANOred+biom_NANOsws+biom_PICO1+biom_PICO3+biom_PICO2+biom_PICOHFLR+biom_CRYPTO
 pico = biom_Syne+biom_PICO1+biom_PICO2+biom_PICO3+biom_PICOHFLR
-nano = biom_NANOred+biom_NANOsws
+nano = biom_NANOred+biom_NANOsws+biom_CRYPTO
 micro = biom_Micro 
+
+tot = tot[1:14]
+pico = pico[1:14]
+nano = nano[1:14]
+micro = micro[1:14]
+lat = lat[1:14]
+lon = lon[1:14]
 
 np.savetxt('../outputs/tot.txt', tot)
 np.savetxt('../outputs/pico.txt', pico)
 np.savetxt('../outputs/nano.txt', nano)
 np.savetxt('../outputs/micro.txt', micro)
+np.savetxt('../outputs/lon.txt', lon)
+np.savetxt('../outputs/lat.txt', lat)
 
 # Create a mask at the front position to extract south and north biomass
 mask = lat > 38.5

@@ -11,7 +11,7 @@ plt.style.use(['science','no-latex'])
 plt.close('all')
 
 # Load the std_variations_abs data from the outputs_deviation.py code
-test_values = ['0.01', '0.096']
+test_values = ['0.01', '0.1']
 variations = []
 for test in test_values:
     variations.append(np.loadtxt(f'sensitivity_variations_{test}.txt'))
@@ -26,9 +26,9 @@ param_names = [r'$\mu^{max}_1$', r'$\mu^{max}_2$', r'$K^P_1$', r'$K^P_2$', r'$g^
 for i, test in enumerate(test_values):
     variations_abs = variations[i]
     cax = axs[i].matshow(variations_abs, cmap='Spectral')
-    axs[i].set_xticks(np.arange(5))
+    axs[i].set_xticks(np.arange(4))
     axs[i].set_yticks(np.arange(len(param_names)))
-    axs[i].set_xticklabels([r'$P_1$', r'$P_2$', r'$Z$', r'$PO4$', r'$R$'])
+    axs[i].set_xticklabels([r'$PO4$', r'$P_1$', r'$P_2$', r'$R$'])
     axs[i].set_yticklabels(param_names)
     axs[i].xaxis.tick_bottom()
     axs[i].set_xlabel('State variable')

@@ -14,7 +14,7 @@ plt.close('all')
 
 # Select the Psupply value and the grazing scenario for which you wish to plot the outputs 
 # (first you need to create the outputs from the code outputs_steadystate.py)
-test = '0.01'
+test = '0.2'
 grazing = "diffgrazing"
 
 # Load the data

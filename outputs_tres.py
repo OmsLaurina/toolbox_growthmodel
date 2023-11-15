@@ -5,7 +5,7 @@ Calculate the resilience time.
 """
 
 import numpy as np
-from growth_model_2P1Z_v10 import growth_model_2P1Z_v10
+from growth_model import growth_model
 from fluxes import pulsedflux_stepfunction
 import matplotlib.pyplot as plt
 import numpy as np
@@ -33,30 +33,36 @@ elif nbpulse == 1:
     [Psupply, arg] = pulsedflux_stepfunction(time_flux, A=b, C=moy_flux, pulsations=[{'t1': 5, 't2': 10}])
 
 # Get the solution at steady state equilibrium
-[P1, P2, Z, PO4, arg] = growth_model_2P1Z_v10(Psupply_cst, time_flux, dt)
+[P1, P2, Z, PO4, arg] = growth_model(Psupply_cst, time_flux, dt)
 P1_eq, P2_eq, Z_eq, PO4_eq = P1[-1], P2[-1], Z[-1], PO4[-1]
+
+# Calculate the variation percentage
+P1, P2, Z, PO4, _ = growth_model(Psupply, time_flux, dt, P1_ini=P1_eq, P2_ini=P2_eq, Z_ini=Z_eq, PO4_ini=PO4_eq) 
+P1_var = np.abs(((P1_eq-P1)/P1_eq))
+P2_var = np.abs(((P2_eq-P2)/P2_eq))
+Z_var = np.abs(((Z_eq-Z)/Z_eq))
+PO4_var = np.abs(((PO4_eq-PO4)/PO4_eq))
 
 # Define the variation rate
 tx = 0.1
 
-P1_eq_var = P1_eq*(1+tx)
-P2_eq_var = P2_eq*(1+tx)
-Z_eq_var = Z_eq*(1+tx)
-PO4_eq_var = PO4_eq*(1+tx)
+P1_eq_var = P1_eq*(1+np.max(P1_var)/2)
+P2_eq_var = P2_eq*(1+np.max(P2_var)/2)
+Z_eq_var = Z_eq*(1+np.max(Z_var)/2)
+PO4_eq_var = PO4_eq*(1+np.max(PO4_var)/2)
+
 V1 = np.sqrt((P1_eq_var-P1_eq)**2+(P2_eq_var-P1_eq)**2+(Z_eq_var-Z_eq)**2+(PO4_eq_var-PO4_eq)**2)
 C1 = (P1_eq_var-P1_eq)**2+(P2_eq_var-P1_eq)**2+(Z_eq_var-Z_eq)**2+(PO4_eq_var-PO4_eq)**2
 
 # New solutions
-P1, P2, Z, PO4, _ = growth_model_2P1Z_v10(Psupply, time_flux, dt, P1_ini=P1_eq, P2_ini=P2_eq, Z_ini=Z_eq, PO4_ini=PO4_eq) 
+P1, P2, Z, PO4, _ = growth_model(Psupply, time_flux, dt, P1_ini=P1_eq, P2_ini=P2_eq, Z_ini=Z_eq, PO4_ini=PO4_eq) 
   
 bo = True
 # Method 1 : calculation of the sphere around equilibrium
-epsilon_carre = []
 for i, t in enumerate(time_flux):
     if t>10:
         C = (P1[i]-P1_eq)**2+(P2[i]-P2_eq)**2+(Z[i]-Z_eq)**2+(PO4[i]-PO4_eq)**2
-        epsilon_carre = abs(C1-C)
-        if C<epsilon_carre and bo:
+        if C<C1 and bo:
             bo = False
             t_res = t
             print('resilience time:', t)      

@@ -7,9 +7,11 @@ Calculate and record the steady-state outputs deviation from default values as a
 import numpy as np
 import numpy as npy
 import matplotlib.pyplot as plt
-from growth_model_2P1Z_v10 import growth_model_2P1Z_v10
+from growth_model import growth_model
 import scienceplots
 import pandas as pd
+from matplotlib.lines import Line2D
+import matplotlib.patches as mpatches
 plt.style.use(['science','no-latex'])
 plt.close('all')
 
@@ -17,10 +19,11 @@ plt.close('all')
 dt = 0.1
 end_time = 2000
 time = npy.arange(0, end_time, dt)
-p = 0.096
+p = 0.01
 test=p
 Psupply = [p] * len(time)
 param_names = ['umax1', 'umax2', 'kP1', 'kP2', 'gmax1', 'gmax2', 'kZ1', 'kZ2']
+param_names2 = [r'$u_{max,1}$', r'$u_{max,2}$', r'$K_{P,1}$', r'$K_{P,2}$', r'$g_{max,1}$', r'$g_{max,2}$', r'$K_{Z,1}$', r'$K_{Z,2}$']
 
 # Default values of parameters
 default_params = {
@@ -82,14 +85,15 @@ params_run3 = {
 }
 
 
-
 custom_colors =['#FFB6C1', '#FFD700', '#98FB98', '#87CEEB', '#FFA07A', '#9370DB', '#90EE90', '#F0E68C']
 fig, axs = plt.subplots(5, 1, figsize=(10, 15))
-variations = np.zeros((len(param_names),5))
+variations = np.zeros((len(param_names),4))
 
 # Define a threshold to force values close to 0 to be equal to 0
 # Values greater than 0.002 are expected by the model. If they are lower, this means 0
 threshold = 10**(-2)
+
+legends = []
 
 # Loop on parameter values
 for i, param_name in enumerate(param_names):
@@ -101,34 +105,35 @@ for i, param_name in enumerate(param_names):
     run3[param_name] *= tx
 
     # Get solutions
-    P1_default, P2_default, Z_default, PO4_default, _ = growth_model_2P1Z_v10(Psupply, time, dt)
-    P1_run2, P2_run2, Z_run2, PO4_run2, _ = growth_model_2P1Z_v10(Psupply, time, dt, **run2)
-    P1_run3, P2_run3, Z_run3, PO4_run3, _ = growth_model_2P1Z_v10(Psupply, time, dt, **run3)
+    P1_default, P2_default, Z_default, PO4_default, _ = growth_model(Psupply, time, dt)
+    P1_run2, P2_run2, Z_run2, PO4_run2, _ = growth_model(Psupply, time, dt, **run2)
+    P1_run3, P2_run3, Z_run3, PO4_run3, _ = growth_model(Psupply, time, dt, **run3)
     R_default = np.array(P1_default) / (np.array(P1_default) + np.array(P2_default))
     R_run3 = np.array(P1_run3) / (np.array(P1_run3) + np.array(P2_run3))
     R_run2 = np.array(P1_run2) / (np.array(P1_run2) + np.array(P2_run2))
     
     # Graphically check solutions for each state variable and parameter value
     color = custom_colors[i % len(custom_colors)]
-    axs[0].plot(time, P1_run2, color=color)
-    axs[0].plot(time, P1_run3, linestyle='dotted', color=color)
-    axs[0].axhline(y=P1_default[-1], color='red', linestyle='--', label='Default')
-    axs[0].set_title('P1')
     
-    axs[1].plot(time, P2_run2, color=color)
-    axs[1].plot(time, P2_run3,  linestyle='dotted',color=color)
-    axs[1].axhline(y=P2_default[-1], color='red', linestyle='--', label='Default')
-    axs[1].set_title('P2')
+    axs[0].plot(time, PO4_run2, color=color)
+    axs[0].plot(time, PO4_run3, linestyle='dotted',color=color)
+    axs[0].axhline(y=PO4_default[-1], color='red', linestyle='--', label='Default')
+    axs[0].set_title('PO4')
     
-    axs[2].plot(time, Z_run2, label='Run2', color=color)
-    axs[2].plot(time, Z_run3, label='Run3', linestyle='dotted',color=color)
-    axs[2].axhline(y=Z_default[-1], color='red', linestyle='--', label='Default')
-    axs[2].set_title('Z')
+    axs[1].plot(time, P1_run2, color=color)
+    axs[1].plot(time, P1_run3, linestyle='dotted', color=color)
+    axs[1].axhline(y=P1_default[-1], color='red', linestyle='--', label='Default')
+    axs[1].set_title(r'$P1$')
     
-    axs[3].plot(time, PO4_run2, color=color)
-    axs[3].plot(time, PO4_run3, linestyle='dotted',color=color)
-    axs[3].axhline(y=PO4_default[-1], color='red', linestyle='--', label='Default')
-    axs[3].set_title('PO4')
+    axs[2].plot(time, P2_run2, color=color)
+    axs[2].plot(time, P2_run3,  linestyle='dotted',color=color)
+    axs[2].axhline(y=P2_default[-1], color='red', linestyle='--', label='Default')
+    axs[2].set_title(r'$P2$')
+    
+    axs[3].plot(time, Z_run2, label='Run2', color=color)
+    axs[3].plot(time, Z_run3, label='Run3', linestyle='dotted',color=color)
+    axs[3].axhline(y=Z_default[-1], color='red', linestyle='--', label='Default')
+    axs[3].set_title('Z')
     
     axs[4].plot(time, R_run2, color=color)
     axs[4].plot(time, R_run3, linestyle='dotted',color=color)
@@ -176,9 +181,22 @@ for i, param_name in enumerate(param_names):
     R_variation = ((R_run3 - R_run2) / R_default) * 100
     print(R_variation)
     
-    variations[i,0:]= np.array([P1_variation,P2_variation,Z_variation,PO4_variation,R_variation])
+    variations[i,0:]= np.array([PO4_variation,P1_variation,P2_variation,R_variation])
 
-plt.subplots_adjust(hspace=0.5)
+    
+plt.subplots_adjust(hspace=0.7)
+
+for i, ax in enumerate(axs):
+    ax.set_xlabel('Time [days]', fontsize = 9)
+    ax.set_ylabel(r'Masse $[mmolC m^{-3}]$', fontsize = 9)
+
+legend_patches = [mpatches.Patch(color=color, label=param_names2) for color, param_names2 in zip(custom_colors, param_names2)]
+fig.legend(handles=legend_patches, loc='center right', bbox_to_anchor=(1.02, 0.5), frameon=False)
+
+custom_lines = [Line2D([0], [0], color='black', linestyle='dotted', label='half'),
+                Line2D([0], [0], color='black', linestyle='-', label='twice')]
+fig.legend(handles=custom_lines, loc='center right', bbox_to_anchor=(1.02, 0.38), frameon=False)
+
 plt.show()
 plt.savefig(f'../figures/sensitivity_test_{p}.pdf', format='pdf')
 np.savetxt(f'../outputs/sensitivity_variations_{test}.txt', variations, fmt='%.8f')

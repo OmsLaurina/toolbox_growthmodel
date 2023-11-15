@@ -25,8 +25,6 @@ dt = 0.1
 end_time = 2000
 time = npy.arange(0,end_time,dt)
 Psupply_moy = 1
-p=0.01
-Psupply = [p] * len(time)
 Psupply_arr = np.array([Psupply_moy]*len(time))
 
 
@@ -54,8 +52,6 @@ arg = {
     'PO4_ini':0.5,    # initial biomass of PO4 [mmolC m^{-3}]
     }
 
-[P1,P2,Z,PO4,arg]=growth_model_2P1Z_v10(Psupply, time, dt,P1_ini=0.6, P2_ini=0.1)
-
 # Number of value tested
 n = 100  
 param = 'psupp'
@@ -64,7 +60,7 @@ name_param= r'$P_{\mathrm{supply}}$ [mmolCm$^{-3}d^{-1}$]'
 
 #Tested range of values
 min_param = 0.01
-max_param = 0.12
+max_param = 0.4
 l_param = np.linspace(min_param,max_param,n)
 
 eigenvalues=[]
@@ -73,6 +69,7 @@ max_real_parts = []
 
 i=0
 
+equilibre = 'P2null'
 for param in l_param:
                                     
     a = arg['gamma']*(1-arg['epsilon2Z']*(1-arg['gamma']))
@@ -83,46 +80,76 @@ for param in l_param:
     x1 = (-b+math.sqrt(delta))/(2*a)
     x2 =(-b-math.sqrt(delta))/(2*a)
     
-    if arg['P2_ini'] == 0: 
+    if equilibre == 'P2null':
+        
+        name_pdf_real_parts = '../outputs/real_partsP1_full.txt'
+        name_pdf_max_real_parts = '../outputs/max_real_partsP1_full.txt'
+        
         P1_barre = x1*arg['kZ1']/(arg['gmax1']-x1)
         P2_barre = 0
         Z_barre = (arg['gamma']*x1-arg['m1Z'])/arg['m2Z']
         PO4_barre = arg['kP1']*(x1*Z_barre+arg['mP1']*P1_barre)/(arg['umax1']*P1_barre-(x1*Z_barre+arg['mP1']*P1_barre))
+        
+        if P1_barre > 0 and Z_barre > 0 and PO4_barre > 0:
+            print(f"Équilibre 'P2null' est positif pour param={param}")
+        else:
+            print(f"Équilibre 'P2null' n'est pas positif pour param={param}")
     
-    if arg['P1_ini'] == 0: 
+    if equilibre == 'P1null':
+        
+        name_pdf_real_parts = '../outputs/real_partsP2_full.txt'
+        name_pdf_max_real_parts = '../outputs/max_real_partsP2_full.txt'
+        
         P1_barre = 0
         P2_barre = x1*arg['kZ2']/(arg['gmax2']-x1)
         Z_barre = (arg['gamma']*x1-arg['m1Z'])/arg['m2Z']
         PO4_barre = arg['kP2']*(x1*Z_barre+arg['mP2']*P2_barre)/(arg['umax2']*P2_barre-(x1*Z_barre+arg['mP2']*P2_barre))
         
-    if arg['P1_ini'] == 0.6 and arg['P2_ini'] == 0.1:
-        [P1,P2,Z,PO4,arg]=growth_model_2P1Z_v10(Psupply_arr*param, time, dt,P1_ini=0.6, P2_ini=0.1)
+        if P2_barre > 0 and Z_barre > 0 and PO4_barre > 0:
+            print(f"Équilibre {equilibre} est positif pour param={param}")
+        else:
+            print(f"Équilibre {equilibre} n'est pas positif pour param={param}")
+        
+    if equilibre == 'coexistence':
+        
+        name_pdf_real_parts = '../outputs/real_partscoex_full.txt'
+        name_pdf_max_real_parts = '../outputs/max_real_partscoex_full.txt'
+        
+        [P1,P2,Z,PO4,arg]=growth_model_2P1Z_v10(Psupply_arr*param, time, dt)
         P1_barre = P1[-1]
         P2_barre = P2[-1]
+        if P2_barre<0.02:
+            P2_barre = 0
         Z_barre = Z[-1]
         PO4_barre = PO4[-1]
+        
+        if P1_barre > 0 and P2_barre > 0 and Z_barre > 0 and PO4_barre > 0:
+            print(f"Équilibre {equilibre} est positif pour param={param}")
+        else:
+            print(f"Équilibre {equilibre} n'est pas positif pour param={param}")
+            
     
     # Jacobian matrix
     
-    j11 = (arg['umax1'] * PO4_barre) / (PO4_barre + arg['kP1']) - (Z_barre * arg['gmax1'] * (P2_barre + arg['kZ1'])) / ((P1_barre + P2_barre + arg['kZ1'])**2) - arg['mP1']
-    j12 = (Z_barre * arg['gmax1'] * P1_barre) / (P1_barre + P2_barre + arg['kZ1'])**2
-    j13 = - (arg['gmax1'] * P1_barre) / (P1_barre + P2_barre + arg['kZ1'])
-    j14 = (P1_barre * arg['umax1'] * arg['kP1']) / (PO4_barre + arg['kP1'])**2
+    j11 = - P1_barre * arg['umax1'] * arg['kP1'] / (PO4_barre + arg['kP1'])**2 - P2_barre * arg['umax2'] * arg['kP2'] / (PO4_barre + arg['kP2'])**2
+    j12 = Z_barre *arg['epsilon2Z']* (1 -arg['gamma']) * (arg['gmax1'] * (P2_barre + arg['kZ1']) / (P1_barre + P2_barre + arg['kZ1'])**2 - arg['gmax2']* P2_barre / (P1_barre + P2_barre + arg['kZ2'])**2) + arg['mP1'] - arg['umax1'] * PO4_barre / (PO4_barre + arg['kP1'])
+    j13 = Z_barre *arg['epsilon2Z']* (1 -arg['gamma']) * (arg['gmax2']* (P1_barre + arg['kZ2']) / (P1_barre + P2_barre + arg['kZ2'])**2 - arg['gmax1'] * P1_barre / (P1_barre + P2_barre + arg['kZ1'])**2) + arg['mP2']- arg['umax2'] * PO4_barre / (PO4_barre + arg['kP2'])
+    j14 = arg['epsilon2Z']* (1 -arg['gamma']) * (arg['gmax1'] * P1_barre / (P1_barre + P2_barre + arg['kZ1']) + arg['gmax2']* P2_barre / (P1_barre + P2_barre + arg['kZ2'])) + arg['epsilon1Z']*arg['m1Z']
+    
+    j21 = (P1_barre * arg['umax1'] * arg['kP1']) / (PO4_barre + arg['kP1'])**2
+    j22 = (arg['umax1'] * PO4_barre) / (PO4_barre + arg['kP1']) - (Z_barre * arg['gmax1'] * (P2_barre + arg['kZ1'])) / ((P1_barre + P2_barre + arg['kZ1'])**2) - arg['mP1']
+    j23 = (Z_barre * arg['gmax1'] * P1_barre) / (P1_barre + P2_barre + arg['kZ1'])**2
+    j24 = - (arg['gmax1'] * P1_barre) / (P1_barre + P2_barre + arg['kZ1'])
 
-    j21 = (Z_barre *arg['gmax2']* P2_barre) / (P1_barre + P2_barre + arg['kZ1'])**2
-    j22 = (arg['umax2'] * PO4_barre) / (PO4_barre + arg['kP2']) - (Z_barre *arg['gmax2']* (P1_barre + arg['kZ1'])) / (P1_barre + P2_barre + arg['kZ1'])**2 - arg['mP2']
-    j23 = - (arg['gmax2']* P2_barre) / (P1_barre + P2_barre + arg['kZ1'])
-    j24 = (P2_barre * arg['umax2'] * arg['kP2']) / (PO4_barre + arg['kP2'])**2
+    j31 = (P2_barre * arg['umax2'] * arg['kP2']) / (PO4_barre + arg['kP2'])**2
+    j32 = (Z_barre *arg['gmax2']* P2_barre) / (P1_barre + P2_barre + arg['kZ1'])**2
+    j33 = (arg['umax2'] * PO4_barre) / (PO4_barre + arg['kP2']) - (Z_barre *arg['gmax2']* (P1_barre + arg['kZ2'])) / (P1_barre + P2_barre + arg['kZ1'])**2 - arg['mP2']
+    j34 = - (arg['gmax2']* P2_barre) / (P1_barre + P2_barre + arg['kZ2'])
 
-    j31 = arg['gamma'] * Z_barre * ((arg['gmax1'] * (P2_barre + arg['kZ1'])) / (P1_barre + P2_barre + arg['kZ1'])**2 - (arg['gmax2']* P2_barre) / (P1_barre + P2_barre + arg['kZ1'])**2)
-    j32 = arg['gamma'] * Z_barre * ((arg['gmax2']* (P1_barre + arg['kZ1'])) / (P1_barre + P2_barre + arg['kZ1'])**2 - (arg['gmax1'] * P1_barre) / (P1_barre + P2_barre + arg['kZ1'])**2)
-    j33 = arg['gamma'] * ((arg['gmax1'] * P1_barre) / (P1_barre + P2_barre + arg['kZ1']) + (arg['gmax2']* P2_barre) / (P1_barre + P2_barre + arg['kZ1'])) - 2*arg['m2Z']*Z_barre-arg['m1Z']
-    j34 = 0
-
-    j41 = Z_barre *arg['epsilon2Z']* (1 -arg['gamma']) * (arg['gmax1'] * (P2_barre + arg['kZ1']) / (P1_barre + P2_barre + arg['kZ1'])**2 - arg['gmax2']* P2_barre / (P1_barre + P2_barre + arg['kZ1'])**2) + arg['mP1'] - arg['umax1'] * PO4_barre / (PO4_barre + arg['kP1'])
-    j42 = Z_barre *arg['epsilon2Z']* (1 -arg['gamma']) * (arg['gmax2']* (P1_barre + arg['kZ1']) / (P1_barre + P2_barre + arg['kZ1'])**2 - arg['gmax1'] * P1_barre / (P1_barre + P2_barre + arg['kZ1'])**2) + arg['mP2']- arg['umax2'] * PO4_barre / (PO4_barre + arg['kP2'])
-    j43 = arg['epsilon2Z']* (1 -arg['gamma']) * (arg['gmax1'] * P1_barre / (P1_barre + P2_barre + arg['kZ1']) + arg['gmax2']* P2_barre / (P1_barre + P2_barre + arg['kZ1'])) + arg['epsilon1Z']*arg['m1Z']
-    j44 = - P1_barre * arg['umax1'] * arg['kP1'] / (PO4_barre + arg['kP1'])**2 - P2_barre * arg['umax2'] * arg['kP2'] / (PO4_barre + arg['kP2'])**2
+    j41 = 0
+    j42 = arg['gamma'] * Z_barre * ((arg['gmax1'] * (P2_barre + arg['kZ1'])) / (P1_barre + P2_barre + arg['kZ1'])**2 - (arg['gmax2']* P2_barre) / (P1_barre + P2_barre + arg['kZ2'])**2)
+    j43 = arg['gamma'] * Z_barre * ((arg['gmax2']* (P1_barre + arg['kZ2'])) / (P1_barre + P2_barre + arg['kZ2'])**2 - (arg['gmax1'] * P1_barre) / (P1_barre + P2_barre + arg['kZ1'])**2)
+    j44 = arg['gamma'] * ((arg['gmax1'] * P1_barre) / (P1_barre + P2_barre + arg['kZ1']) + (arg['gmax2']* P2_barre) / (P1_barre + P2_barre + arg['kZ2'])) - 2*arg['m2Z']*Z_barre-arg['m1Z']
     
     J = [[j11,j12,j13,j14], [j21,j22,j23,j24], [j31,j32,j33,j34],[j41,j42,j43,j44]]
     
@@ -141,34 +168,55 @@ for param in l_param:
     
     i=i+1
     print(i)
-    
-np.savetxt('../outputs/real_parts2.txt', real_parts_matrix)
-np.savetxt('../outputs/max_real_parts2.txt', max_real_parts)
+ 
+np.savetxt(name_pdf_real_parts, real_parts_matrix)
+np.savetxt(name_pdf_max_real_parts, max_real_parts)
 
 # Check if the solutions obtain with the jacobian matrix are in consistence with numerical solutions
 
-a = arg['gamma']*(1-arg['epsilon2Z']*(1-arg['gamma']))
-b = -(1-arg['epsilon2Z']*(1-arg['gamma'])+arg['epsilon1Z']*arg['gamma'])*arg['m1Z']
-c = arg['epsilon1Z']*arg['m1Z']**2-p*arg['m2Z']
+if equilibre == 'P2null':
+    
+    p=0.01
+    Psupply = [p] * len(time)
+    [P1,P2,Z,PO4,arg]=growth_model_2P1Z_v10(Psupply, time, dt, P1_ini=0.6, P2_ini=0.1)
+    
+    a = arg['gamma']*(1-arg['epsilon2Z']*(1-arg['gamma']))
+    b = -(1-arg['epsilon2Z']*(1-arg['gamma'])+arg['epsilon1Z']*arg['gamma'])*arg['m1Z']
+    c = arg['epsilon1Z']*arg['m1Z']**2-p*arg['m2Z']
 
-delta = b**2-4*a*c
-x1 = (-b+math.sqrt(delta))/(2*a)
-x2 =(-b-math.sqrt(delta))/(2*a)
-
-if arg['P2_ini'] == 0: 
+    delta = b**2-4*a*c
+    x1 = (-b+math.sqrt(delta))/(2*a)
+    x2 =(-b-math.sqrt(delta))/(2*a)
+    
     P1_barre = x1*arg['kZ1']/(arg['gmax1']-x1)
     P2_barre = 0
     Z_barre = (arg['gamma']*x1-arg['m1Z'])/arg['m2Z']
     PO4_barre = arg['kP1']*(x1*Z_barre+arg['mP1']*P1_barre)/(arg['umax1']*P1_barre-(x1*Z_barre+arg['mP1']*P1_barre))
 
-if arg['P1_ini'] == 0: 
+if equilibre == 'P1null':
+    
+    p=0.3
+    Psupply = [p] * len(time)
+    [P1,P2,Z,PO4,arg]=growth_model_2P1Z_v10(Psupply, time, dt, P1_ini=0.6, P2_ini=0.1)
+    
+    a = arg['gamma']*(1-arg['epsilon2Z']*(1-arg['gamma']))
+    b = -(1-arg['epsilon2Z']*(1-arg['gamma'])+arg['epsilon1Z']*arg['gamma'])*arg['m1Z']
+    c = arg['epsilon1Z']*arg['m1Z']**2-p*arg['m2Z']
+
+    delta = b**2-4*a*c
+    x1 = (-b+math.sqrt(delta))/(2*a)
+    
     P1_barre = 0
     P2_barre = x1*arg['kZ2']/(arg['gmax2']-x1)
     Z_barre = (arg['gamma']*x1-arg['m1Z'])/arg['m2Z']
     PO4_barre = arg['kP2']*(x1*Z_barre+arg['mP2']*P2_barre)/(arg['umax2']*P2_barre-(x1*Z_barre+arg['mP2']*P2_barre))
 
-if arg['P1_ini'] == 0.6 and arg['P2_ini'] == 0.1:
-    [P1,P2,Z,PO4,arg]=growth_model_2P1Z_v10(Psupply, time, dt, P1_ini=0.6, P2_ini=0.1)
+if equilibre == 'coexistence':
+    
+    p=0.05
+    Psupply = [p] * len(time)
+    
+    [P1,P2,Z,PO4,arg]=growth_model_2P1Z_v10(Psupply, time, dt)
     P1_barre = P1[-1]
     P2_barre = P2[-1]
     Z_barre = Z[-1]
@@ -192,32 +240,38 @@ P1_ini = arg['P1_ini']
 P2_ini = arg['P2_ini']
 Z_ini = arg['Z_ini']
 PO4_ini = arg['PO4_ini']
+
 CI = [P1_ini, P2_ini, Z_ini, PO4_ini]
+
 t_span = (0, end_time)
 solution = solve_ivp(growth_model, [0, end_time], CI, method='RK45', t_eval=time, args=(p,))
+
 P1, P2, Z, PO4 = solution.y
+
 a = arg['gamma']*(1-arg['epsilon2Z']*(1-arg['gamma']))
 b = -(1-arg['epsilon2Z']*(1-arg['gamma'])+arg['epsilon1Z']*arg['gamma'])*arg['m1Z']
 c = arg['epsilon1Z']*arg['m1Z']**2-p*arg['m2Z']
+
 delta = b**2-4*a*c
+
 x1 = (-b+math.sqrt(delta))/(2*a)
 x2 =(-b-math.sqrt(delta))/(2*a)
 
 #Calcul des points d'équilibre
-if P2_ini == 0: 
+if equilibre == 'P2null':
     P1_barre = x1*arg['kZ1']/(arg['gmax1']-x1)
     P2_barre = 0
     Z_barre = (arg['gamma']*x1-arg['m1Z'])/arg['m2Z']
     PO4_barre = arg['kP1']*(x1*Z_barre+arg['mP1']*P1_barre)/(arg['umax1']*P1_barre-(x1*Z_barre+arg['mP1']*P1_barre))
 
-if P1_ini == 0: 
+if equilibre == 'P1null':
     P1_barre = 0
     P2_barre = x1*arg['kZ2']/(arg['gmax2']-x1)
     Z_barre = (arg['gamma']*x1-arg['m1Z'])/arg['m2Z']
     PO4_barre = arg['kP2']*(x1*Z_barre+arg['mP2']*P2_barre)/(arg['umax2']*P2_barre-(x1*Z_barre+arg['mP2']*P2_barre))
     
-if arg['P1_ini'] == 0.6 and arg['P2_ini'] == 0.1:
-    [P1,P2,Z,PO4,arg]=growth_model_2P1Z_v10(Psupply, time,  dt, P1_ini=0.6, P2_ini=0.1)
+if equilibre == 'coexistence':
+    [P1,P2,Z,PO4,arg]=growth_model_2P1Z_v10(Psupply, time,  dt)
     P1_barre = P1[-1]
     P2_barre = P2[-1]
     Z_barre = Z[-1]

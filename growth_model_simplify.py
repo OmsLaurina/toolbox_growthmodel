@@ -1,4 +1,4 @@
-def growth_model_2P1Z_v10_simplify(Psupply,time,**kwargs):
+def growth_model_simplify(Psupply,time,**kwargs):
     
     global dt, umax1, umax2, gmax1, gmax2, kP1, kP2, kZ, eZ, epsilon, mZ, gamma1, gamma2, u1, u2, g1, g2, PP1, PP2, G1, G2, P1, P2, Z, PO4, P01, P02, Z0, PO40
 

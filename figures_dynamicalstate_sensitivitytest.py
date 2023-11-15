@@ -27,7 +27,7 @@ max_param = 0.1
 l_param = np.linspace(min_param, max_param, 10)
 
 ## Color map configuration
-colors = ['#006400', '#ffffff', '#00ff00']
+colors = ['darkgreen', '#ffffff', 'chartreuse']
 n_bins = 100
 cmap_name = 'custom_green'
 cm = plt.cm.colors.LinearSegmentedColormap.from_list(cmap_name, colors, N=n_bins)
@@ -54,10 +54,10 @@ for i, data in enumerate([(time_flux1, P1_1, P2_1, Z_1, PO4_1, Psupply1),
     ax = plt.subplot(gs[0, i])
     time_flux, P1, P2, Z, PO4, Psupply = data
     ax.plot(time_flux, Psupply, label=r'$P_{supply}$', color="darkgray")
+    ax.plot(time_flux, PO4, label=r'$PO4$', color="magenta")
     ax.plot(time_flux, P1, label=r'$P_1$', color="chartreuse")
     ax.plot(time_flux, P2, label=r'$P_2$', color="green")
     ax.plot(time_flux, Z, label=r'$Z$', color="aqua")
-    ax.plot(time_flux, PO4, label=r'$PO4$', color="magenta")
     ax.set_xlabel('Time [d]', fontsize=10)
     ax.set_ylabel('Masses [mmolCm$^{-3}$]', fontsize=10)
     ax.set_ylim(0, 0.65)

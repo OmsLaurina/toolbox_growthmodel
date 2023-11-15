@@ -12,7 +12,7 @@ from scipy.optimize import fsolve
 import math
 import scienceplots
 import sys
-from growth_model_2P1Z_v10_simplify import growth_model_2P1Z_v10_simplify
+from growth_model_simplify import growth_model_simplify
 sys.path.append('../')
 plt.close('all')
 
@@ -65,7 +65,7 @@ param = 'psupp'
  
 #Tested range of values
 min_param = 0.01
-max_param = 0.12
+max_param = 0.4
 l_param = np.linspace(min_param,max_param,n)
 
 # Define the empty matrices    
@@ -127,22 +127,26 @@ for param in l_param:
         PO4 = apo4*P2+cpo4
     
     # Jacobian matrix
-    j11 = (umax1 / kP1) * PO4 - (gmax1 / kZ1) * Z - mP1
-    j12 = 0
-    j13 = -(gmax1 / kZ1) * P1
-    j14 = (umax1 / kP1) * P1
-    j21 = 0
-    j22 = (umax2 / kP2) * PO4 - (gmax2 / kZ2) * Z - mP2
-    j23 = -(gmax2 / kZ2) * P2
-    j24 = (umax2 / kP2) * P2
-    j31 = Z * gamma * (gmax1 / kZ1)
-    j32 = Z * gamma * (gmax2 / kZ2)
-    j33 = gamma * ((gmax1 / kZ1) * P1 + (gmax2 / kZ2) * P2) - 2 * m2Z * Z - m1Z
-    j34 = 0
-    j41 = Z * epsilonP * (1 - gamma) * (gmax1 / kZ1) + mP1 - (umax1 / kP1) * PO4
-    j42 = Z * epsilonP * (1 - gamma) * (gmax2 / kZ2) + mP2 - (umax2 / kP2) * PO4
-    j43 = epsilonP * (1 - gamma) * ((gmax1 / kZ1) * P1 + (gmax2 / kZ2) * P2) + epsilon2Z * m2Z
-    j44 = -(umax1 / kP1) * P1 - (umax2 / kP2) * P2
+    j11 = -(umax1 / kP1) * P1 - (umax2 / kP2) * P2
+    j12 = Z * epsilonP * (1 - gamma) * (gmax1 / kZ1) + mP1 - (umax1 / kP1) * PO4
+    j13 = Z * epsilonP * (1 - gamma) * (gmax2 / kZ2) + mP2 - (umax2 / kP2) * PO4
+    j14 = epsilonP * (1 - gamma) * ((gmax1 / kZ1) * P1 + (gmax2 / kZ2) * P2) + epsilon2Z * m2Z
+    
+    j21 = (umax1 / kP1) * P1
+    j22 = (umax1 / kP1) * PO4 - (gmax1 / kZ1) * Z - mP1
+    j23 = 0
+    j24 = -(gmax1 / kZ1) * P1
+    
+    j31 = (umax2 / kP2) * P2
+    j32 = 0
+    j33 = (umax2 / kP2) * PO4 - (gmax2 / kZ2) * Z - mP2
+    j34 = -(gmax2 / kZ2) * P2
+    
+    j41 = 0
+    j42 = Z * gamma * (gmax1 / kZ1)
+    j43 = Z * gamma * (gmax2 / kZ2)
+    j44 = gamma * ((gmax1 / kZ1) * P1 + (gmax2 / kZ2) * P2) - 2 * m2Z * Z - m1Z
+    
     J = [[j11,j12,j13,j14], [j21,j22,j23,j24], [j31,j32,j33,j34], [j41,j42,j43,j44]]
     
     eigenvalues.append(np.linalg.eigvals(J)) 
@@ -176,7 +180,7 @@ if Phyto == 'P2null':
     p = 0.01
     Psupply = [p] * len(time)
     
-    [P1,P2,Z,PO4,Export,u1,u2,g1,g2,arg]=growth_model_2P1Z_v10_simplify(Psupply, time, P2_ini = 0)
+    [P1,P2,Z,PO4,Export,u1,u2,g1,g2,arg]=growth_model_simplify(Psupply, time, P2_ini = 0)
        
     az = arg['gamma']*arg['gmax1']/(arg['m2Z']*arg['kZ1'])
     cz = arg['m1Z']/arg['m2Z']
@@ -201,7 +205,7 @@ if Phyto == 'P1null':
     p = 0.1
     Psupply = [p] * len(time)
     
-    [P1,P2,Z,PO4,Export,u1,u2,g1,g2,arg]=growth_model_2P1Z_v10_simplify(Psupply, time, P1_ini = 0)
+    [P1,P2,Z,PO4,Export,u1,u2,g1,g2,arg]=growth_model_simplify(Psupply, time, P1_ini = 0)
     
     az = arg['gamma']*arg['gmax2']/(arg['m2Z']*arg['kZ2'])
     cz = arg['m1Z']/arg['m2Z']

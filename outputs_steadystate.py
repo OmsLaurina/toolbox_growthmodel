@@ -11,7 +11,7 @@ from growth_model import growth_model
 dt = 0.1
 end_time = 2000
 time = np.arange(0, end_time, dt)
-Psupply_moy = 0.096
+Psupply_moy = 0.1
 Psupply = [Psupply_moy] * len(time)
 
 # For output file name (to save results obtained with different Psupply)
@@ -22,7 +22,7 @@ test = Psupply_moy
 
 #### Testing the importance of differential grazing #####
 
-grazing = 'nograzing'
+grazing = 'diffgrazing'
 
 [P1, P2, Z, PO4, arg] = growth_model(Psupply, time, dt, gmax1=0, gmax2=0)
 data_filename = f'../outputs/steadystate_{grazing}_{test}.txt'
