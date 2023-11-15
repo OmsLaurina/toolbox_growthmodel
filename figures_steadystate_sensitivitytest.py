@@ -13,19 +13,20 @@ from matplotlib.ticker import MaxNLocator
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import scienceplots
 from f_monod_hollingII import f_monod
+from set_up import set_up_steadystate
 
 plt.style.use(['science','no-latex'])
 plt.close('all')
 
-## Configuration of the Psupply sensitivity test (identical to the configuration of the outpts_steadystate_sensitivitytest.py code)
+## Define the set up
+
+dt, end_time, time, Psupply, Psupply_cst, Psupply_senstest, l_param = set_up_steadystate()
+
 name_param = r'$P_{\mathrm{supply}}$ [mmolCm$^{-3}d^{-1}$]'
-n = 100
-min_param = 0.01
-max_param = 0.1
-l_param = np.linspace(min_param, max_param, n)
 grazing = "diffgrazing"
 
 # Figure 1 (figure 6 in article): Effect of Psupply on the R ratio and time trend for the two extreme Psupply values.
+
 name_pdf = f"../figures/{grazing}.pdf"
 
 fig = plt.figure(figsize=(12,3))
@@ -72,10 +73,10 @@ test = 0.01
 data = np.loadtxt(f'../outputs/steadystate_{grazing}_{test}.txt')
 time, P1, P2, Z, PO4 = data.T
 ax = fig.add_subplot(gs[0])
+ax.plot(time, PO4, label=r'$PO4$', color="magenta")
 ax.plot(time, P1, label=r'$P_1$', color="chartreuse")
 ax.plot(time, P2, label=r'$P_2$', color="green")
 ax.plot(time, Z, label=r'$Z$', color="aqua")
-ax.plot(time, PO4, label=r'$PO4$', color="magenta")
 ax.set_xlabel('Time [d]', fontsize=10)
 ax.set_ylabel(r'Masses [mmolCm$^{-3}$]', fontsize=10)
 ax.set_xticks([0, 500, 1000])
@@ -90,10 +91,10 @@ test = 0.1
 data = np.loadtxt(f'../outputs/steadystate_{grazing}_{test}.txt')
 time, P1, P2, Z, PO4 = data.T
 ax = fig.add_subplot(gs[2])
+ax.plot(time, PO4, label=r'$PO4$', color="magenta")
 ax.plot(time, P1, label=r'$P_1$', color="chartreuse")
 ax.plot(time, P2, label=r'$P_2$', color="green")
 ax.plot(time, Z, label=r'$Z$', color="aqua")
-ax.plot(time, PO4, label=r'$PO4$', color="magenta")
 ax.set_xlabel('Time [d]', fontsize=10)
 ax.set_ylabel(r'Masses [mmolCm$^{-3}$]', fontsize=10)
 ax.set_xticks([0, 500, 1000])
@@ -124,37 +125,37 @@ plt.yticks([0, 0.25, 0.5, 0.75, 1])
 plt.savefig(f'../figures/R-ratio_{grazing}.pdf', format='pdf')
 
 
-# # Figure 2 (figure 5 in article): Effect of Psupply on the R ratio and time trend for the two extreme Psupply values.
-# plt.figure(3)
-# plt.rc('font', size=7)
-# name_pdf_monod = '../figures/monod.pdf'
-# arg = {
-#     'umax1': 1.9872,
-#     'umax2': 2.7648,
-#     'kP1': 1,
-#     'kP2': 3,
-#     'gmax1':3.89,
-#     'gmax2':0.43,
-#     'kZ1': 5,
-#     'kZ2': 20,
-# }
-# N_theo_PO4 = np.linspace(0, 6, len(time))
-# f_monod(N_theo_PO4, arg['umax1'], arg['kP1'],"chartreuse")
-# f_monod(N_theo_PO4, arg['umax2'], arg['kP2'],"green")
-# # f_monod(P_O4, arg['umax1'], arg['kP1'],"gray")
-# # f_monod(P_O4, arg['umax2'], arg['kP2'],"lightgray")
-# plt.xlabel('PO4 [mmolCm\u207B\u00B3]')
-# plt.ylabel(r'$\mu\ [d^{-1}]$')
-# plt.ylim(0,2)
-# plt.axvline(x=1.378, color='red', linestyle='--', label="[PO4] observed")
-# plt.axvline(x=min(P_O4), color='lightcoral', linestyle='--', label="Min PO4")
-# plt.axvline(x=max(P_O4), color='lightcoral', linestyle='--', label="Max PO4")
-# plt.fill_betweenx(np.linspace(0, max(plt.ylim()), n), min(P_O4), max(P_O4), color='red', alpha=0.3, label='Range')
+# Figure 2
+plt.figure(3)
+plt.rc('font', size=7)
+name_pdf_monod = '../figures/monod.pdf'
+arg = {
+    'umax1': 1.9872,
+    'umax2': 2.7648,
+    'kP1': 1,
+    'kP2': 3,
+    'gmax1':3.89,
+    'gmax2':0.43,
+    'kZ1': 5,
+    'kZ2': 20,
+}
+N_theo_PO4 = np.linspace(0, 6, len(time))
+f_monod(N_theo_PO4, arg['umax1'], arg['kP1'],"chartreuse")
+f_monod(N_theo_PO4, arg['umax2'], arg['kP2'],"green")
+# f_monod(P_O4, arg['umax1'], arg['kP1'],"gray")
+# f_monod(P_O4, arg['umax2'], arg['kP2'],"lightgray")
+plt.xlabel('PO4 [mmolCm\u207B\u00B3]')
+plt.ylabel(r'$\mu\ [d^{-1}]$')
+plt.ylim(0,2)
+plt.axvline(x=1.378, color='red', linestyle='--', label="[PO4] observed")
+plt.axvline(x=min(P_O4), color='lightcoral', linestyle='--', label="Min PO4")
+plt.axvline(x=max(P_O4), color='lightcoral', linestyle='--', label="Max PO4")
+plt.fill_betweenx(np.linspace(0, max(plt.ylim()), len(l_param)), min(P_O4), max(P_O4), color='red', alpha=0.3, label='Range')
 
-# plt.legend(handles=[plt.Line2D([0], [0], color='chartreuse', label=r'$P_1$'),
-#                 plt.Line2D([0], [0], color='green', label=r'$P_2$'),
-#                 plt.Line2D([0], [0], color='red', linestyle='--', label='Observed [PO4]'),
-#                 plt.Line2D([0], [0], color='lightcoral', linestyle='--', label='Modeled [PO4] range')
-#                 ])
+plt.legend(handles=[plt.Line2D([0], [0], color='chartreuse', label=r'$P_1$'),
+                plt.Line2D([0], [0], color='green', label=r'$P_2$'),
+                plt.Line2D([0], [0], color='red', linestyle='--', label='Observed [PO4]'),
+                plt.Line2D([0], [0], color='lightcoral', linestyle='--', label='Modeled [PO4] range')
+                ])
 
-# plt.savefig(name_pdf_monod, format='pdf')
+plt.savefig(name_pdf_monod, format='pdf')

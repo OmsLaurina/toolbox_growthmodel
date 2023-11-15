@@ -7,14 +7,13 @@ Created on Fri Sep  1 09:36:07 2023
 """
 
 import matplotlib.pyplot as plt
-import numpy as npy
 import numpy as np
 from scipy.integrate import solve_ivp
 import math
 import scienceplots
 import sys
-from growth_model_2P1Z_v10 import growth_model_2P1Z_v10 
-from growth_model_2P1Z_v10_RK45 import growth_model
+from growth_model import growth_model
+from growth_model_RK45 import growth_model
 
 sys.path.append('../')
 plt.style.use(['science','no-latex'])
@@ -23,7 +22,7 @@ plt.close('all')
 # Define the set up
 dt = 0.1
 end_time = 2000
-time = npy.arange(0,end_time,dt)
+time = np.arange(0,end_time,dt)
 Psupply_moy = 1
 Psupply_arr = np.array([Psupply_moy]*len(time))
 
@@ -115,7 +114,7 @@ for param in l_param:
         name_pdf_real_parts = '../outputs/real_partscoex_full.txt'
         name_pdf_max_real_parts = '../outputs/max_real_partscoex_full.txt'
         
-        [P1,P2,Z,PO4,arg]=growth_model_2P1Z_v10(Psupply_arr*param, time, dt)
+        [P1,P2,Z,PO4,arg]=growth_model(Psupply_arr*param, time, dt)
         P1_barre = P1[-1]
         P2_barre = P2[-1]
         if P2_barre<0.02:
@@ -178,7 +177,7 @@ if equilibre == 'P2null':
     
     p=0.01
     Psupply = [p] * len(time)
-    [P1,P2,Z,PO4,arg]=growth_model_2P1Z_v10(Psupply, time, dt, P1_ini=0.6, P2_ini=0.1)
+    [P1,P2,Z,PO4,arg]=growth_model(Psupply, time, dt, P1_ini=0.6, P2_ini=0.1)
     
     a = arg['gamma']*(1-arg['epsilon2Z']*(1-arg['gamma']))
     b = -(1-arg['epsilon2Z']*(1-arg['gamma'])+arg['epsilon1Z']*arg['gamma'])*arg['m1Z']
@@ -197,7 +196,7 @@ if equilibre == 'P1null':
     
     p=0.3
     Psupply = [p] * len(time)
-    [P1,P2,Z,PO4,arg]=growth_model_2P1Z_v10(Psupply, time, dt, P1_ini=0.6, P2_ini=0.1)
+    [P1,P2,Z,PO4,arg]=growth_model(Psupply, time, dt, P1_ini=0.6, P2_ini=0.1)
     
     a = arg['gamma']*(1-arg['epsilon2Z']*(1-arg['gamma']))
     b = -(1-arg['epsilon2Z']*(1-arg['gamma'])+arg['epsilon1Z']*arg['gamma'])*arg['m1Z']
@@ -216,7 +215,7 @@ if equilibre == 'coexistence':
     p=0.05
     Psupply = [p] * len(time)
     
-    [P1,P2,Z,PO4,arg]=growth_model_2P1Z_v10(Psupply, time, dt)
+    [P1,P2,Z,PO4,arg]=growth_model(Psupply, time, dt)
     P1_barre = P1[-1]
     P2_barre = P2[-1]
     Z_barre = Z[-1]
@@ -271,7 +270,7 @@ if equilibre == 'P1null':
     PO4_barre = arg['kP2']*(x1*Z_barre+arg['mP2']*P2_barre)/(arg['umax2']*P2_barre-(x1*Z_barre+arg['mP2']*P2_barre))
     
 if equilibre == 'coexistence':
-    [P1,P2,Z,PO4,arg]=growth_model_2P1Z_v10(Psupply, time,  dt)
+    [P1,P2,Z,PO4,arg]=growth_model(Psupply, time,  dt)
     P1_barre = P1[-1]
     P2_barre = P2[-1]
     Z_barre = Z[-1]

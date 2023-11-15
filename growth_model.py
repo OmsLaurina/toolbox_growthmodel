@@ -12,9 +12,9 @@
 
  Optional inputs:
      **kwargs parameters of models, initial conditions, timestep. Set by default here, but you can modify it as :
-      [P1,P2,Z,PO4,arg]=growth_model_2P1Z_v9(Psupply, time, dt, umax1=0.2) for example
+      [P1,P2,Z,PO4,arg]=growth_model(Psupply, time, dt, umax1=0.2) for example
 
- *nom du papier une fois publié* for public version
+ * * for public version
  
  Reference: Messié, M., & Chavez, F. P. (2017). nutrient supply, surface currents, and plankton dynamics predict zooplankton hotspots 
 					in coastal upwelling systems. Geophysical Research Letters, 44(17), 8979-8986, https://doi.org/10.1002/2017GL074322

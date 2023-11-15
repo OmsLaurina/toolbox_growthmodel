@@ -6,23 +6,21 @@ Calculate and record the steady-state outputs of the model as a function of the 
 
 import numpy as np
 from growth_model import growth_model
+from set_up import set_up_steadystate
 
 # Define the set up
-dt = 0.1
-end_time = 2000
-time = np.arange(0, end_time, dt)
-Psupply_moy = 0.1
-Psupply = [Psupply_moy] * len(time)
+# Modify the set_up script to change de value of the Psupply_cst
+dt, end_time, time, Psupply, Psupply_cst, Psupply_senstest, l_param = set_up_steadystate()
 
 # For output file name (to save results obtained with different Psupply)
-test = Psupply_moy
+test = Psupply_cst
 
 # Call the function
 [P1, P2, Z, PO4, arg] = growth_model(Psupply, time, dt)
 
 #### Testing the importance of differential grazing #####
 
-grazing = 'diffgrazing'
+grazing = 'nograzing'
 
 [P1, P2, Z, PO4, arg] = growth_model(Psupply, time, dt, gmax1=0, gmax2=0)
 data_filename = f'../outputs/steadystate_{grazing}_{test}.txt'

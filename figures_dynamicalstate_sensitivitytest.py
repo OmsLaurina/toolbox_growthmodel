@@ -17,32 +17,39 @@ plt.style.use(['science','no-latex'])
 plt.close('all')
 
 
-## Configuration of the sensitivity test (identical to the configuration of the outpts_dynamicalstate_sensitivitytest.py code)
+## Define the set up
+
 dt = 0.1
 end_time_flux = 90
 time_flux2 = np.arange(0, end_time_flux, dt)
 nb_time = len(time_flux2)
 min_param = 0.01
 max_param = 0.1
-l_param = np.linspace(min_param, max_param, 10)
+l_param = np.linspace(min_param, max_param, 100)
 
 ## Color map configuration
 colors = ['darkgreen', '#ffffff', 'chartreuse']
-n_bins = 100
+n_bins = 15
 cmap_name = 'custom_green'
 cm = plt.cm.colors.LinearSegmentedColormap.from_list(cmap_name, colors, N=n_bins)
-plt.rc('font', size=7)
 
+colors2 = ['#ffffff', 'gray', 'black']
+n_bins = 15
+cmap_name2 = 'custom_grays'
+cm2 = plt.cm.colors.LinearSegmentedColormap.from_list(cmap_name2, colors2, N=n_bins)
+
+
+plt.rc('font', size=7)
 
 fig = plt.figure(figsize=(10, 7))
 gs = GridSpec(3, 3, width_ratios=[1, 1, 1], height_ratios=[1, 1, 1]) 
 
 # Load data from the outputs_dynamicalstate.py code
-data1 = np.loadtxt('dynamicalstate_pulse1_b0.08_d90.txt')
+data1 = np.loadtxt('../outputs/dynamicalstate_pulse1_b0.08_d90.txt')
 time_flux1, P1_1, P2_1, Z_1, PO4_1, Psupply1 = data1.T
-data2 = np.loadtxt('dynamicalstate_pulse2_b0.08_d90.txt')
+data2 = np.loadtxt('../outputs/dynamicalstate_pulse2_b0.08_d90.txt')
 time_flux2, P1_2, P2_2, Z_2, PO4_2, Psupply2 = data2.T
-data3 = np.loadtxt('dynamicalstate_pulse3_b0.08_d90.txt')
+data3 = np.loadtxt('../outputs/dynamicalstate_pulse3_b0.08_d90.txt')
 time_flux3, P1_3, P2_3, Z_3, PO4_3, Psupply3 = data3.T
 
 # Loop to create the subplot
@@ -89,7 +96,7 @@ for i in range(3):
 for i in range(3):
     ax = plt.subplot(gs[2, i])
     ratio = np.loadtxt(f'dynamicalstate_senstitivitytest_b_pulse{i+1}_d90_Z.txt')
-    im = ax.imshow(ratio, cmap='Greys', aspect='auto', origin='lower', extent=[0, (nb_time-1)*dt, l_param[0], l_param[-1]])
+    im = ax.imshow(ratio, cmap=cm2, aspect='auto', origin='lower', extent=[0, (nb_time-1)*dt, l_param[0], l_param[-1]])
     ax.set_xlabel('Time [d]', fontsize=10)
     ax.set_ylabel('b [mmolCm$^{-3}d^{-1}$]', fontsize=10)
     ax.axhline(y=0.08, color='gray', linestyle='--')

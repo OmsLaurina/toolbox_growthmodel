@@ -8,13 +8,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scienceplots
 from f_monod_hollingII import f_monod
+from set_up import set_up_steadystate
 
 plt.style.use(['science', 'no-latex'])
 plt.close('all')
+ 
+# first you need to create the outputs from the code outputs_steadystate.py
 
-# Select the Psupply value and the grazing scenario for which you wish to plot the outputs 
-# (first you need to create the outputs from the code outputs_steadystate.py)
-test = '0.2'
+dt, end_time, time, Psupply, Psupply_cst, Psupply_senstest, l_param = set_up_steadystate()
+test = Psupply_cst
 grazing = "diffgrazing"
 
 # Load the data
@@ -35,7 +37,7 @@ plt.xticks([0, 500, 1000, 1500, 2000])
 legend = plt.legend(frameon=True, loc='upper right')
 plt.gca().add_artist(legend)
 
-figure_filename = f'../outputs/steadystate_temporalevolution_{test}.pdf'
+figure_filename = f'../figures/steadystate_temporalevolution_{test}.pdf'
 plt.savefig(figure_filename, format='pdf') 
 
 
@@ -77,5 +79,5 @@ plt.legend(handles=[plt.Line2D([0], [0], color='chartreuse', label=r'$P_1$'),
 
                 ])
 
-figure_filename = f'../outputs/Monodcurves_{test}.pdf'
+figure_filename = f'../figures/Monodcurves_{test}.pdf'
 plt.savefig(figure_filename, format='pdf')
