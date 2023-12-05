@@ -1,8 +1,8 @@
 """
-
-Calculate and record the steady-state outputs of the model as a function of a range of Psupply value.
-
+* Calculate and record the steady-state outputs of the model as a function of a range of Psupply value.
+* The configuration is defined within the "set_up" function in the "set_up.py" script.
 """
+
 import numpy as npy
 import numpy as np
 from growth_model import growth_model
@@ -15,13 +15,13 @@ from set_up import set_up_steadystate
 plt.style.use(['science', 'no-latex'])
 plt.close('all')
 
-# Define the set up
+# Configuration
+dt, end_time, time, Psupply, Psupply_cst, Psupply_senstest, min_param, max_param,l_param = set_up_steadystate()
 
-dt, end_time, time, Psupply, Psupply_cst, Psupply_senstest, l_param = set_up_steadystate()
-
+# Choose the grazing control type
 grazing = 'diffgrazing'
 
-# parameter and file names
+# Parameter and file names
 param = 'Psupp'
 name_param = r'$P_{\mathrm{supply}}$ [mmolC m$^{-3}d^{-1}$]'
 filename = f"../outputs/steadystate_senstitivitytest_{param}_{grazing}.txt"
@@ -35,7 +35,7 @@ Z_=np.zeros((len(l_param)))
 
 i=0
 
-fig, axs = plt.subplots(2, 2, figsize=(6, 4))
+fig, axs = plt.subplots(2, 2, figsize=(8, 6))
 fig2 = plt.figure(figsize=(8, 6))
 ax2 = fig2.add_subplot(111, projection='3d')
 
@@ -61,7 +61,7 @@ for param in l_param:
     # Check graphicly if the model is in steady state for each value of Psupply
     
     color = plt.cm.plasma(i / len(l_param))
-    titles = [r'$PO4$', r'$P_1$',r'$P_2$',r'$Z$']
+    titles = [r'$PO_4$', r'$P_1$',r'$P_2$',r'$Z$']
     # Temporal evolution
     axs[0,0].plot(time, PO4, label=f'PO4 (param={param})', color=color)
     axs[0,1].plot(time, P1, label=f'P1 (param={param})', color=color)
@@ -74,19 +74,18 @@ for param in l_param:
 sm = plt.cm.ScalarMappable(cmap=plt.cm.plasma)
 sm.set_array(l_param)
 
-cbar = fig.colorbar(sm, ax=axs, orientation='vertical', shrink=0.5, pad=-0.45)
+cbar = fig.colorbar(sm, ax=axs, orientation='vertical', shrink=0.5, pad=0.05)
 cbar.set_label(name_param)
 
 for i in range(2):
     for j in range(2):
         axs[i, j].set_title(titles[i * 2 + j])
-plt.tight_layout()
-
 for i in range(2):
     axs[1, i].set_xlabel("Time [d]")
 for i in range(2):
     axs[i, 0].set_ylabel("Masses [mmolC m$^{-3}$]")
-plt.subplots_adjust(wspace=0.3)
+
+
 fig.savefig('../figures/evol_temp.pdf', format='pdf')
 plt.show()
 

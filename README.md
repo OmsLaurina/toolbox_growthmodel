@@ -6,6 +6,8 @@ Detailed explanations of each code and directories below.
 
 All codes starting with 'outputs' generate the .txt files for the analyses, while the codes starting with 'figures' create the visual figures using the .txt files from each analysis.
 
+* set_up.py: Functions employed to specify the configuration parameters (discretization parameters, Psupply values, etc.) utilized in each model code. Adapt this script to replicate the analysis conducted in the article.
+
 * growth_model.py: Function defining the full model (Explicit Euler method).
 * growth_model_simplify.py: Function defining the simplified model (Explicit Euler method).
 
@@ -24,13 +26,13 @@ All codes starting with 'outputs' generate the .txt files for the analyses, whil
 * outputs_deviation.py: Calculates the sensitivity of the state variable to the model parameter values.
 * figures_deviation.py: Plots the sensitivity of the state variable to the model parameter values. Reproduces Fig. 7.
 
-* outputs_biomasses.py: Calculates the in situ biomasses with the method of Menden-Deurer and Lessard (2000).
-* outputs_biomasses2.py: Regroupes the 9 phytoplanktons groups into 3 size groups and calculates the f_biom.
-* figures_insitu.py: Plots the in situ regrouped biomasses. Reproduces Fig. 2 and Fig. 9 (left part).
-
 * outputs_jacobianmatrix_fullmodel.py: Calculates the Jacobian matrix of the full model from the numerical solutions.
 * outputs_jacobianmatrix_simplifymodel.py: Calculates the Jacobian matrix of the simplified model from the analytical solutions.
 * figures_diagrbifurc.py: Plots the bifurcation diagrams of the full and simplified models. Reproduces Fig. 4.
+
+* outputs_biomasses.py: Calculates the in situ biomasses with the method of Menden-Deurer and Lessard (2000).
+* outputs_biomasses2.py: Regroupes the 9 phytoplanktons groups into 3 size groups and calculates the f_biom.
+* figures_insitu.py: Plots the in situ regrouped biomasses. Reproduces Fig. 2 and Fig. 9 (left part).
 
 * outputs_tres: Calculates the resilience time.
 

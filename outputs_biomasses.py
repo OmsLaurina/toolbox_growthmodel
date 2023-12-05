@@ -1,17 +1,19 @@
 import numpy as np
 import pandas as pd
+import statistics
+
 
 # Load data of abundances and FWS
-index_hipp = slice(409, 422) # index for the transect showed by Tzortzis et al 2021: 408, 423, and for the full hippodrome: 408, 511
+index_hipp = slice(408, 511) # index for the transect showed by Tzortzis et al 2021: 409, 422, and for the full hippodrome: 408, 511
 n = index_hipp.stop - index_hipp.start
 
 data_ab = np.loadtxt('../BioSWOTmed_data/data_CYTO_NEW.txt', delimiter=';')
 data_ab = data_ab[index_hipp, :]
 
 # For the full hippodrome 
-# ligne_a_supprimer = [16, 17]
-# data_ab = np.delete(data_ab, ligne_a_supprimer, axis=0)
-# n = index_hipp.stop - index_hipp.start - len(ligne_a_supprimer)
+ligne_a_supprimer = [16, 17]
+data_ab = np.delete(data_ab, ligne_a_supprimer, axis=0)
+n = index_hipp.stop - index_hipp.start - len(ligne_a_supprimer)
 
 lat_ab = data_ab[:, 23]
 lon_ab = data_ab[:, 22]
@@ -29,7 +31,7 @@ for i, chosen_group in enumerate(group_names):
         data_FWS = pd.read_csv('../BioSWOTmed_data/FWS_ALL synechococcus .txt', delimiter=';') 
         
         # log-log regression coefficients from Menden-Deurer 2000 Table.4: Protist plankton* (line 1)
-        a = 0.21
+        a = 0.210
         b = 0.939
     
     if chosen_group == 'PICO1':
@@ -37,7 +39,7 @@ for i, chosen_group in enumerate(group_names):
         data_FWS = pd.read_csv('../BioSWOTmed_data/FWS_ALL red_pico_euk .txt', delimiter=';')
         
         # log-log regression coefficients from Menden-Deurer 2000 Table.4: Protist plankton* (line 1)
-        a = 0.21
+        a = 0.210
         b = 0.939
     
     if chosen_group == 'PICO2':
@@ -45,7 +47,7 @@ for i, chosen_group in enumerate(group_names):
         data_FWS = pd.read_csv('../BioSWOTmed_data/FWS_ALL red_pico_2 .txt', delimiter=';')
         
         # log-log regression coefficients from Menden-Deurer 2000 Table.4: Protist plankton* (line 1)
-        a = 0.21
+        a = 0.210
         b = 0.939
     
     if chosen_group == 'PICO3':
@@ -61,7 +63,7 @@ for i, chosen_group in enumerate(group_names):
                 pass
             
         # log-log regression coefficients from Menden-Deurer 2000 Table.4: Protist plankton* (line 1)
-        a = 0.21
+        a = 0.210
         b = 0.939
     
     if chosen_group == 'PICOHFLR':
@@ -77,40 +79,40 @@ for i, chosen_group in enumerate(group_names):
                 pass
         
         # log-log regression coefficients from Menden-Deurer 2000 Table.4: Protist plankton* (line 1)
-        a = 0.21
+        a = 0.210
         b = 0.939
     
     if chosen_group == 'NANOsws':
         ab = data_ab[:, 11]
         data_FWS = pd.read_csv('../BioSWOTmed_data/FWS_ALL red-nano-euk-sws .txt', delimiter=';')
         
-        # log-log regression coefficients from Menden-Deurer 2000 Table.4: Prymnesiophytes (line 9)
-        a = 0.228
-        b = 0.899
+        # log-log regression coefficients from Menden-Deurer 2000 Table.4: Protist plankton (line 2)
+        a = 0.261
+        b = 0.860
     
     if chosen_group == 'NANOred':
         ab = data_ab[:, 12]
         data_FWS = pd.read_csv('../BioSWOTmed_data/FWS_ALL red_nano_euk .txt', delimiter=';')
         
-        # log-log regression coefficients from Menden-Deurer 2000 Table.4: Prymnesiophytes (line 9)
-        a = 0.228
-        b = 0.899
+        # log-log regression coefficients from Menden-Deurer 2000 Table.4: Protist plankton (line 2)
+        a = 0.261
+        b = 0.860
         
     if chosen_group == 'CRYPTO':
         ab = data_ab[:, 7]
         data_FWS = pd.read_csv('../BioSWOTmed_data/FWS_ALL cryptophyte .txt', delimiter=';')
             
-        # log-log regression coefficients from Menden-Deurer 2000 Table.4: Prymnesiophytes (line 9)
-        a = 0.228
-        b = 0.899
+        # log-log regression coefficients from Menden-Deurer 2000 Table.4: Protist plankton (line 2)
+        a = 0.261
+        b = 0.860
     
     if chosen_group == 'MICRO':
         ab = data_ab[:, 13]
         data_FWS = pd.read_csv('../BioSWOTmed_data/FWS_ALL microphyto .txt', delimiter=';')
         
         # log-log regression coefficients from Menden-Deurer 2000 Table.4: Diatoms (line 3)
-        a = 0.287
-        b = 0.811
+        a = 0.116
+        b = 0.881
         
     # Transform table
     FWS = data_FWS.iloc[:, 0:n].values
@@ -133,6 +135,8 @@ for i, chosen_group in enumerate(group_names):
     ## Calculate Qc [pgC/cell]
     
     Qc = a*bioV_um3**b
+    print(chosen_group,np.nanmin(Qc))
+    print(chosen_group,np.nanmax(Qc))
     
     # [fgC/cell]
     Qc_north1 = (a*bioV_north**b)*1e3
@@ -153,6 +157,7 @@ for i, chosen_group in enumerate(group_names):
     
     biom_north = ab_north * np.nanmean(Qc_north)
     biom_south = ab_south * np.nanmean(Qc_south)
+    # biom = ab*np.nanmean(Qc)
     biom = ab*np.nanmean(Qc)
     
     ### Save biomasses and corresponding lon/lat

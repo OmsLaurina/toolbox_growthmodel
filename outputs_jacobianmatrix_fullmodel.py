@@ -1,9 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-Created on Fri Sep  1 09:36:07 2023
-
-@author: loms
+* Calculate and record the jacobien matrix terms of the full model, in function of the psupply range.
+* The configuration is defined within the "set_up" function in the "set_up.py" script.
 """
 
 import matplotlib.pyplot as plt
@@ -13,19 +10,14 @@ import math
 import scienceplots
 import sys
 from growth_model import growth_model
-from growth_model_RK45 import growth_model
+from set_up import set_up_diagrbifurc
 
 sys.path.append('../')
 plt.style.use(['science','no-latex'])
 plt.close('all')
 
-# Define the set up
-dt = 0.1
-end_time = 2000
-time = np.arange(0,end_time,dt)
-Psupply_moy = 1
-Psupply_arr = np.array([Psupply_moy]*len(time))
-
+# Configuration
+dt, end_time, time, Psupply_moy, Psupply_arr, n, l_param = set_up_diagrbifurc()
 
 # Parameters
 arg = {
@@ -51,16 +43,9 @@ arg = {
     'PO4_ini':0.5,    # initial biomass of PO4 [mmolC m^{-3}]
     }
 
-# Number of value tested
-n = 100  
 param = 'psupp'
 # name for plot
 name_param= r'$P_{\mathrm{supply}}$ [mmolCm$^{-3}d^{-1}$]'
-
-#Tested range of values
-min_param = 0.01
-max_param = 0.4
-l_param = np.linspace(min_param,max_param,n)
 
 eigenvalues=[]
 real_parts_list=[]
@@ -68,7 +53,7 @@ max_real_parts = []
 
 i=0
 
-equilibre = 'P2null'
+equilibre = 'coexistence'
 for param in l_param:
                                     
     a = arg['gamma']*(1-arg['epsilon2Z']*(1-arg['gamma']))
@@ -171,118 +156,118 @@ for param in l_param:
 np.savetxt(name_pdf_real_parts, real_parts_matrix)
 np.savetxt(name_pdf_max_real_parts, max_real_parts)
 
-# Check if the solutions obtain with the jacobian matrix are in consistence with numerical solutions
+# # Check if the solutions obtain with the jacobian matrix are in consistence with numerical solutions
 
-if equilibre == 'P2null':
+# if equilibre == 'P2null':
     
-    p=0.01
-    Psupply = [p] * len(time)
-    [P1,P2,Z,PO4,arg]=growth_model(Psupply, time, dt, P1_ini=0.6, P2_ini=0.1)
+#     p=0.01
+#     Psupply = [p] * len(time)
+#     [P1,P2,Z,PO4,arg]=growth_model(Psupply, time, dt, P1_ini=0.6, P2_ini=0.1)
     
-    a = arg['gamma']*(1-arg['epsilon2Z']*(1-arg['gamma']))
-    b = -(1-arg['epsilon2Z']*(1-arg['gamma'])+arg['epsilon1Z']*arg['gamma'])*arg['m1Z']
-    c = arg['epsilon1Z']*arg['m1Z']**2-p*arg['m2Z']
+#     a = arg['gamma']*(1-arg['epsilon2Z']*(1-arg['gamma']))
+#     b = -(1-arg['epsilon2Z']*(1-arg['gamma'])+arg['epsilon1Z']*arg['gamma'])*arg['m1Z']
+#     c = arg['epsilon1Z']*arg['m1Z']**2-p*arg['m2Z']
 
-    delta = b**2-4*a*c
-    x1 = (-b+math.sqrt(delta))/(2*a)
-    x2 =(-b-math.sqrt(delta))/(2*a)
+#     delta = b**2-4*a*c
+#     x1 = (-b+math.sqrt(delta))/(2*a)
+#     x2 =(-b-math.sqrt(delta))/(2*a)
     
-    P1_barre = x1*arg['kZ1']/(arg['gmax1']-x1)
-    P2_barre = 0
-    Z_barre = (arg['gamma']*x1-arg['m1Z'])/arg['m2Z']
-    PO4_barre = arg['kP1']*(x1*Z_barre+arg['mP1']*P1_barre)/(arg['umax1']*P1_barre-(x1*Z_barre+arg['mP1']*P1_barre))
+#     P1_barre = x1*arg['kZ1']/(arg['gmax1']-x1)
+#     P2_barre = 0
+#     Z_barre = (arg['gamma']*x1-arg['m1Z'])/arg['m2Z']
+#     PO4_barre = arg['kP1']*(x1*Z_barre+arg['mP1']*P1_barre)/(arg['umax1']*P1_barre-(x1*Z_barre+arg['mP1']*P1_barre))
 
-if equilibre == 'P1null':
+# if equilibre == 'P1null':
     
-    p=0.3
-    Psupply = [p] * len(time)
-    [P1,P2,Z,PO4,arg]=growth_model(Psupply, time, dt, P1_ini=0.6, P2_ini=0.1)
+#     p=0.3
+#     Psupply = [p] * len(time)
+#     [P1,P2,Z,PO4,arg]=growth_model(Psupply, time, dt, P1_ini=0.6, P2_ini=0.1)
     
-    a = arg['gamma']*(1-arg['epsilon2Z']*(1-arg['gamma']))
-    b = -(1-arg['epsilon2Z']*(1-arg['gamma'])+arg['epsilon1Z']*arg['gamma'])*arg['m1Z']
-    c = arg['epsilon1Z']*arg['m1Z']**2-p*arg['m2Z']
+#     a = arg['gamma']*(1-arg['epsilon2Z']*(1-arg['gamma']))
+#     b = -(1-arg['epsilon2Z']*(1-arg['gamma'])+arg['epsilon1Z']*arg['gamma'])*arg['m1Z']
+#     c = arg['epsilon1Z']*arg['m1Z']**2-p*arg['m2Z']
 
-    delta = b**2-4*a*c
-    x1 = (-b+math.sqrt(delta))/(2*a)
+#     delta = b**2-4*a*c
+#     x1 = (-b+math.sqrt(delta))/(2*a)
     
-    P1_barre = 0
-    P2_barre = x1*arg['kZ2']/(arg['gmax2']-x1)
-    Z_barre = (arg['gamma']*x1-arg['m1Z'])/arg['m2Z']
-    PO4_barre = arg['kP2']*(x1*Z_barre+arg['mP2']*P2_barre)/(arg['umax2']*P2_barre-(x1*Z_barre+arg['mP2']*P2_barre))
+#     P1_barre = 0
+#     P2_barre = x1*arg['kZ2']/(arg['gmax2']-x1)
+#     Z_barre = (arg['gamma']*x1-arg['m1Z'])/arg['m2Z']
+#     PO4_barre = arg['kP2']*(x1*Z_barre+arg['mP2']*P2_barre)/(arg['umax2']*P2_barre-(x1*Z_barre+arg['mP2']*P2_barre))
 
-if equilibre == 'coexistence':
+# if equilibre == 'coexistence':
     
-    p=0.05
-    Psupply = [p] * len(time)
+#     p=0.05
+#     Psupply = [p] * len(time)
     
-    [P1,P2,Z,PO4,arg]=growth_model(Psupply, time, dt)
-    P1_barre = P1[-1]
-    P2_barre = P2[-1]
-    Z_barre = Z[-1]
-    PO4_barre = PO4[-1]
+#     [P1,P2,Z,PO4,arg]=growth_model(Psupply, time, dt)
+#     P1_barre = P1[-1]
+#     P2_barre = P2[-1]
+#     Z_barre = Z[-1]
+#     PO4_barre = PO4[-1]
 
-plt.figure(1)
-plt.rc('font', size=7)
-plt.plot(time, P1, label=r'$P_1$', color="chartreuse")
-plt.plot(time, P2, label=r'$P_2$', color="green")
-plt.plot(time, Z, label=r'$Z$', color="aqua")
-plt.plot(time, PO4, label=r'$PO4$', color="magenta")
-plt.axhline(y=P1_barre, color='chartreuse', linestyle='--')
-plt.axhline(y=P2_barre, color='green', linestyle='--')
-plt.axhline(y=PO4_barre, color='magenta', linestyle='--')
-plt.axhline(y=Z_barre, color='aqua', linestyle='--')
+# plt.figure(1)
+# plt.rc('font', size=7)
+# plt.plot(time, P1, label=r'$P_1$', color="chartreuse")
+# plt.plot(time, P2, label=r'$P_2$', color="green")
+# plt.plot(time, Z, label=r'$Z$', color="aqua")
+# plt.plot(time, PO4, label=r'$PO4$', color="magenta")
+# plt.axhline(y=P1_barre, color='chartreuse', linestyle='--')
+# plt.axhline(y=P2_barre, color='green', linestyle='--')
+# plt.axhline(y=PO4_barre, color='magenta', linestyle='--')
+# plt.axhline(y=Z_barre, color='aqua', linestyle='--')
 
 
-# Check if the solutions obtain with the jacobian matrix are in consistence with numerical solutions from RK45
+# # Check if the solutions obtain with the jacobian matrix are in consistence with numerical solutions from RK45
 
-P1_ini = arg['P1_ini']
-P2_ini = arg['P2_ini']
-Z_ini = arg['Z_ini']
-PO4_ini = arg['PO4_ini']
+# P1_ini = arg['P1_ini']
+# P2_ini = arg['P2_ini']
+# Z_ini = arg['Z_ini']
+# PO4_ini = arg['PO4_ini']
 
-CI = [P1_ini, P2_ini, Z_ini, PO4_ini]
+# CI = [P1_ini, P2_ini, Z_ini, PO4_ini]
 
-t_span = (0, end_time)
-solution = solve_ivp(growth_model, [0, end_time], CI, method='RK45', t_eval=time, args=(p,))
+# t_span = (0, end_time)
+# solution = solve_ivp(growth_model, [0, end_time], CI, method='RK45', t_eval=time, args=(p,))
 
-P1, P2, Z, PO4 = solution.y
+# P1, P2, Z, PO4 = solution.y
 
-a = arg['gamma']*(1-arg['epsilon2Z']*(1-arg['gamma']))
-b = -(1-arg['epsilon2Z']*(1-arg['gamma'])+arg['epsilon1Z']*arg['gamma'])*arg['m1Z']
-c = arg['epsilon1Z']*arg['m1Z']**2-p*arg['m2Z']
+# a = arg['gamma']*(1-arg['epsilon2Z']*(1-arg['gamma']))
+# b = -(1-arg['epsilon2Z']*(1-arg['gamma'])+arg['epsilon1Z']*arg['gamma'])*arg['m1Z']
+# c = arg['epsilon1Z']*arg['m1Z']**2-p*arg['m2Z']
 
-delta = b**2-4*a*c
+# delta = b**2-4*a*c
 
-x1 = (-b+math.sqrt(delta))/(2*a)
-x2 =(-b-math.sqrt(delta))/(2*a)
+# x1 = (-b+math.sqrt(delta))/(2*a)
+# x2 =(-b-math.sqrt(delta))/(2*a)
 
-#Calcul des points d'équilibre
-if equilibre == 'P2null':
-    P1_barre = x1*arg['kZ1']/(arg['gmax1']-x1)
-    P2_barre = 0
-    Z_barre = (arg['gamma']*x1-arg['m1Z'])/arg['m2Z']
-    PO4_barre = arg['kP1']*(x1*Z_barre+arg['mP1']*P1_barre)/(arg['umax1']*P1_barre-(x1*Z_barre+arg['mP1']*P1_barre))
+# #Calcul des points d'équilibre
+# if equilibre == 'P2null':
+#     P1_barre = x1*arg['kZ1']/(arg['gmax1']-x1)
+#     P2_barre = 0
+#     Z_barre = (arg['gamma']*x1-arg['m1Z'])/arg['m2Z']
+#     PO4_barre = arg['kP1']*(x1*Z_barre+arg['mP1']*P1_barre)/(arg['umax1']*P1_barre-(x1*Z_barre+arg['mP1']*P1_barre))
 
-if equilibre == 'P1null':
-    P1_barre = 0
-    P2_barre = x1*arg['kZ2']/(arg['gmax2']-x1)
-    Z_barre = (arg['gamma']*x1-arg['m1Z'])/arg['m2Z']
-    PO4_barre = arg['kP2']*(x1*Z_barre+arg['mP2']*P2_barre)/(arg['umax2']*P2_barre-(x1*Z_barre+arg['mP2']*P2_barre))
+# if equilibre == 'P1null':
+#     P1_barre = 0
+#     P2_barre = x1*arg['kZ2']/(arg['gmax2']-x1)
+#     Z_barre = (arg['gamma']*x1-arg['m1Z'])/arg['m2Z']
+#     PO4_barre = arg['kP2']*(x1*Z_barre+arg['mP2']*P2_barre)/(arg['umax2']*P2_barre-(x1*Z_barre+arg['mP2']*P2_barre))
     
-if equilibre == 'coexistence':
-    [P1,P2,Z,PO4,arg]=growth_model(Psupply, time,  dt)
-    P1_barre = P1[-1]
-    P2_barre = P2[-1]
-    Z_barre = Z[-1]
-    PO4_barre = PO4[-1]
+# if equilibre == 'coexistence':
+#     [P1,P2,Z,PO4,arg]=growth_model(Psupply, time,  dt)
+#     P1_barre = P1[-1]
+#     P2_barre = P2[-1]
+#     Z_barre = Z[-1]
+#     PO4_barre = PO4[-1]
 
-plt.figure(3)
-plt.rc('font', size=7)
-plt.plot(time, P1, label=r'$P_1$', color="chartreuse")
-plt.plot(time, P2, label=r'$P_2$', color="green")
-plt.plot(time, Z, label=r'$Z$', color="aqua")
-plt.plot(time, PO4, label=r'$PO4$', color="magenta")
-plt.axhline(y=P1_barre, color='chartreuse', linestyle='--')
-plt.axhline(y=P2_barre, color='green', linestyle='--')
-plt.axhline(y=PO4_barre, color='magenta', linestyle='--')
-plt.axhline(y=Z_barre, color='aqua', linestyle='--')
+# plt.figure(3)
+# plt.rc('font', size=7)
+# plt.plot(time, P1, label=r'$P_1$', color="chartreuse")
+# plt.plot(time, P2, label=r'$P_2$', color="green")
+# plt.plot(time, Z, label=r'$Z$', color="aqua")
+# plt.plot(time, PO4, label=r'$PO4$', color="magenta")
+# plt.axhline(y=P1_barre, color='chartreuse', linestyle='--')
+# plt.axhline(y=P2_barre, color='green', linestyle='--')
+# plt.axhline(y=PO4_barre, color='magenta', linestyle='--')
+# plt.axhline(y=Z_barre, color='aqua', linestyle='--')

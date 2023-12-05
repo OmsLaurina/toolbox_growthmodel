@@ -1,7 +1,7 @@
 """
-
-plot the steady-state outputs of the model as a function of the value chosen for Psupply.
-
+* Plot the steady-state outputs of the model as a function of the value chosen for Psupply.
+* The configuration is defined within the "set_up" function in the "set_up.py" script.
+* First you need to create the outputs from the "outputs_steadystate.py" script.
 """
 
 import matplotlib.pyplot as plt
@@ -12,14 +12,15 @@ from set_up import set_up_steadystate
 
 plt.style.use(['science', 'no-latex'])
 plt.close('all')
- 
-# first you need to create the outputs from the code outputs_steadystate.py
 
-dt, end_time, time, Psupply, Psupply_cst, Psupply_senstest, l_param = set_up_steadystate()
+# Configuration
+dt, end_time, time, Psupply, Psupply_cst, Psupply_senstest, min_param, max_param,l_param = set_up_steadystate()
 test = Psupply_cst
+
+# Choose the grazing control type
 grazing = "diffgrazing"
 
-# Load the data
+# Load the data (create by "outputs_steadystate.py")
 data = np.loadtxt(f'../outputs/steadystate_{grazing}_{test}.txt')
 time, P1, P2, Z, PO4 = data.T
 
@@ -30,7 +31,7 @@ plt.rc('font', size=7)
 plt.plot(time, P1, label=r'$P_1$', color="chartreuse")
 plt.plot(time, P2, label=r'$P_2$', color="green")
 plt.plot(time, Z, label=r'$Z$', color="aqua")
-plt.plot(time, PO4, label=r'$PO4$', color="magenta")
+plt.plot(time, PO4, label=r'$PO_4$', color="magenta")
 plt.xlabel('Time [day]', fontsize=10)
 plt.ylabel('Masses [mmolC.m\u207B\u00B3]', fontsize=10)
 plt.xticks([0, 500, 1000, 1500, 2000])
@@ -68,7 +69,7 @@ f_monod(N_theo_PO4, arg['umax2'], arg['kP2'], "green")
 f_monod(PO4, arg['umax1'], arg['kP1'], "gray")
 f_monod(PO4, arg['umax2'], arg['kP2'], "lightgray")
 
-plt.xlabel('PO4 [mmolC.m\u207B\u00B3]')
+plt.xlabel(r'$PO_4$ [mmolC.m\u207B\u00B3]')
 plt.ylabel(r'$\mu [d^{-1}]$')
 plt.axvline(x=1.378, color='red', linestyle='--', label="[PO4] standard")
 plt.axvline(x=PO4[-1], color='lightcoral', linestyle='--', label="[PO4] modelized")

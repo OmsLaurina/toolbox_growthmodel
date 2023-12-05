@@ -1,31 +1,23 @@
 """
-
-Plot the dynaical-state outputs of the model as a function of a range of amplitude b. Create the figure 8 of the paper.
-
+* Plot the dynaical-state outputs of the model as a function of a range of amplitude b. Create the figure 8 of the paper.
+* The configuration is defined within the "set_up" function in the "set_up.py" script.
+* First you need to create the outputs from the "outputs_dynamicalstate_sensitivitytest.py" script.
 """
 
 import matplotlib.pyplot as plt
-import numpy as npy
 import numpy as np
 import scienceplots
-from matplotlib.cm import ScalarMappable
 from matplotlib.gridspec import GridSpec
+from set_up import set_up_dynamicalstate, set_up_steadystate
 import sys
 sys.path.append('../')
 
 plt.style.use(['science','no-latex'])
 plt.close('all')
 
-
-## Define the set up
-
-dt = 0.1
-end_time_flux = 90
-time_flux2 = np.arange(0, end_time_flux, dt)
-nb_time = len(time_flux2)
-min_param = 0.01
-max_param = 0.1
-l_param = np.linspace(min_param, max_param, 100)
+# Configuration
+dt, end_time, time, Psupply, Psupply_cst, Psupply_senstest, min_param, max_param,l_param = set_up_steadystate()
+dt, Psupply_ini, b, nbpulse, end_time_flux, time_flux, nb_time_flux = set_up_dynamicalstate()
 
 ## Color map configuration
 colors = ['darkgreen', '#ffffff', 'chartreuse']
@@ -61,12 +53,12 @@ for i, data in enumerate([(time_flux1, P1_1, P2_1, Z_1, PO4_1, Psupply1),
     ax = plt.subplot(gs[0, i])
     time_flux, P1, P2, Z, PO4, Psupply = data
     ax.plot(time_flux, Psupply, label=r'$P_{supply}$', color="darkgray")
-    ax.plot(time_flux, PO4, label=r'$PO4$', color="magenta")
+    ax.plot(time_flux, PO4, label=r'$PO_4$', color="magenta")
     ax.plot(time_flux, P1, label=r'$P_1$', color="chartreuse")
     ax.plot(time_flux, P2, label=r'$P_2$', color="green")
     ax.plot(time_flux, Z, label=r'$Z$', color="aqua")
     ax.set_xlabel('Time [d]', fontsize=10)
-    ax.set_ylabel('Masses [mmolCm$^{-3}$]', fontsize=10)
+    ax.set_ylabel('Masses [mmolC m$^{-3}$]', fontsize=10)
     ax.set_ylim(0, 0.65)
     ax.set_xlim(0, 90)
     if i == 0:
@@ -81,9 +73,9 @@ for i, data in enumerate([(time_flux1, P1_1, P2_1, Z_1, PO4_1, Psupply1),
 for i in range(3):
     ax = plt.subplot(gs[1, i])
     ratio = np.loadtxt(f'dynamicalstate_senstitivitytest_b_pulse{i+1}_d90_ratio.txt')
-    im = ax.imshow(ratio, cmap=cm, aspect='auto', origin='lower', extent=[0, (nb_time-1)*dt, l_param[0], l_param[-1]])
+    im = ax.imshow(ratio, cmap=cm, aspect='auto', origin='lower', extent=[0, (nb_time_flux-1)*dt, l_param[0], l_param[-1]])
     ax.set_xlabel('Time [d]', fontsize=10)
-    ax.set_ylabel('b [mmolCm$^{-3}d^{-1}$]', fontsize=10)
+    ax.set_ylabel('b [mmolC m$^{-3}d^{-1}$]', fontsize=10)
     ax.axhline(y=0.08, color='gray', linestyle='--')
     ax.annotate(r'$P_2$', xy=(0.1, -0.49), xycoords='axes fraction', fontsize=12, ha='right')
     ax.annotate(r'$P_1$', xy=(0.9, -0.49), xycoords='axes fraction', fontsize=12, ha='left')
@@ -96,12 +88,12 @@ for i in range(3):
 for i in range(3):
     ax = plt.subplot(gs[2, i])
     ratio = np.loadtxt(f'dynamicalstate_senstitivitytest_b_pulse{i+1}_d90_Z.txt')
-    im = ax.imshow(ratio, cmap=cm2, aspect='auto', origin='lower', extent=[0, (nb_time-1)*dt, l_param[0], l_param[-1]])
+    im = ax.imshow(ratio, cmap=cm2, aspect='auto', origin='lower', extent=[0, (nb_time_flux-1)*dt, l_param[0], l_param[-1]])
     ax.set_xlabel('Time [d]', fontsize=10)
-    ax.set_ylabel('b [mmolCm$^{-3}d^{-1}$]', fontsize=10)
+    ax.set_ylabel('b [mmolC m$^{-3}d^{-1}$]', fontsize=10)
     ax.axhline(y=0.08, color='gray', linestyle='--')
     cbar = plt.colorbar(im, ax=ax, orientation='horizontal', pad=0.25, shrink=0.7)
-    cbar.set_label(r'$Z$ [mmolCm$^{-3}$]', fontsize=10)
+    cbar.set_label(r'$Z$ [mmolC m$^{-3}$]', fontsize=10)
     im.set_clim(0.4, 0.6)
     ax.set_xlim(0, 90)
     

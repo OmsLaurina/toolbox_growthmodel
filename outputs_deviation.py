@@ -5,23 +5,16 @@ Calculate and record the steady-state outputs deviation from default values as a
 """
 
 import numpy as np
-import numpy as npy
 import matplotlib.pyplot as plt
 from growth_model import growth_model
 import scienceplots
-import pandas as pd
 from matplotlib.lines import Line2D
 import matplotlib.patches as mpatches
+from set_up import set_up_steadystate
 plt.style.use(['science','no-latex'])
 plt.close('all')
 
-# Define the set up
-dt = 0.1
-end_time = 2000
-time = npy.arange(0, end_time, dt)
-p = 0.01
-test=p
-Psupply = [p] * len(time)
+dt, end_time, time, Psupply, Psupply_cst, Psupply_senstest, min_param, max_param,l_param = set_up_steadystate()
 param_names = ['umax1', 'umax2', 'kP1', 'kP2', 'gmax1', 'gmax2', 'kZ1', 'kZ2']
 param_names2 = [r'$u_{max,1}$', r'$u_{max,2}$', r'$K_{P,1}$', r'$K_{P,2}$', r'$g_{max,1}$', r'$g_{max,2}$', r'$K_{Z,1}$', r'$K_{Z,2}$']
 
@@ -118,7 +111,7 @@ for i, param_name in enumerate(param_names):
     axs[0].plot(time, PO4_run2, color=color)
     axs[0].plot(time, PO4_run3, linestyle='dotted',color=color)
     axs[0].axhline(y=PO4_default[-1], color='red', linestyle='--', label='Default')
-    axs[0].set_title('PO4')
+    axs[0].set_title(r'$PO_4$')
     
     axs[1].plot(time, P1_run2, color=color)
     axs[1].plot(time, P1_run3, linestyle='dotted', color=color)
@@ -198,5 +191,5 @@ custom_lines = [Line2D([0], [0], color='black', linestyle='dotted', label='half'
 fig.legend(handles=custom_lines, loc='center right', bbox_to_anchor=(1.02, 0.38), frameon=False)
 
 plt.show()
-plt.savefig(f'../figures/sensitivity_test_{p}.pdf', format='pdf')
-np.savetxt(f'../outputs/sensitivity_variations_{test}.txt', variations, fmt='%.8f')
+plt.savefig(f'../figures/sensitivity_test_{Psupply_cst}.pdf', format='pdf')
+np.savetxt(f'../outputs/sensitivity_variations_{Psupply_cst}.txt', variations, fmt='%.8f')

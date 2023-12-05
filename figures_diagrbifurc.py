@@ -7,15 +7,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scienceplots
 import sys
-from growth_model_2P1Z_v10_simplify import growth_model_2P1Z_v10_simplify
+from set_up import set_up_diagrbifurc
 
 sys.path.append('../')
 plt.style.use(['science','no-latex'])
 plt.close('all')
 
+# Configuration
+dt, end_time, time, Psupply_moy, Psupply_arr, n, l_param = set_up_diagrbifurc()
 
-l_param = np.loadtxt('../outputs/l_param.txt') # Load from 
-name_param = r'$P_{SUPPLY}$ $[mmolCm^{-3}d^{-1}]$'
+name_param = r'$P_{SUPPLY}$ $[mmolC m^{-3}d^{-1}]$'
 plt.figure(figsize=(7.5, 3))
 
 # Left panel

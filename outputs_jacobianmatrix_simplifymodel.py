@@ -13,11 +13,12 @@ import math
 import scienceplots
 import sys
 from growth_model_simplify import growth_model_simplify
+from set_up import set_up_diagrbifurc
 sys.path.append('../')
 plt.close('all')
 
-
-Psupply_moy = 1
+# Configuration
+dt, end_time, time, Psupply_moy, Psupply_arr, n, l_param = set_up_diagrbifurc()
 
 arg = {
     'umax1':1.9872,   # maximum growth rates of P1 [d^{-1}]
@@ -59,14 +60,8 @@ epsilonP = arg['epsilonP']
 epsilon1Z = arg['epsilon1Z']
 epsilon2Z = arg['epsilon2Z']
 
-# Number of tested value 
-n = 100
+
 param = 'psupp'
- 
-#Tested range of values
-min_param = 0.01
-max_param = 0.4
-l_param = np.linspace(min_param,max_param,n)
 
 # Define the empty matrices    
 eigenvalues=[]
@@ -75,14 +70,14 @@ max_real_parts = []
 c_lim = []
     
 # Set the equilibrium P1null or P2null
-Phyto = 'P1null'
+Phyto = 'P2null'
 
 i=0
 
 # Loop on param
 for param in l_param:
 
-    if Phyto == 'P2null':
+    if Phyto == 'P1null':
         
         name_pdf_real_parts = '../outputs/real_partsP1.txt'
         name_pdf_max_real_parts = '../outputs/max_real_partsP1.txt'

@@ -29,12 +29,15 @@ f_biomass_syne,f_biomass_nano,f_biomass_micro = f_BioM.T
 
 # Figure 1 (figure 2 of the paper): Biomasses distribution
 fig = plt.figure(figsize=(8,4))
-ax1 = fig.add_subplot(1, 4, 1) # PICO
-ax2 = fig.add_subplot(1, 4, 2) # MICRO
-ax3 = fig.add_subplot(1, 4, 3) # NANO
-ax4 = fig.add_subplot(1, 4, 4) # TOT
+ax1 = fig.add_subplot(1, 3, 1) # PICO
+ax2 = fig.add_subplot(1, 3, 2) # MICRO
+ax3 = fig.add_subplot(1, 3, 3) # NANO
+# ax4 = fig.add_subplot(1, 4, 4) # TOT
 
-scatter1 = ax1.scatter(lon, lat, c=pico, cmap='viridis')
+normal_size = 20
+
+# scatter1 = ax1.scatter(lon, lat, c=pico, cmap='viridis')
+scatter1 = ax1.scatter(lon, lat, c=pico, s=[normal_size if i > 13 else normal_size*3.5 for i in range(len(lon))], cmap='viridis')
 ax1.set_title(r'$PICO$' + '\n$f_{BioM}=' + str(round(f_biomass_syne, 1)) + '$')
 ax1.set_xlabel('Longitude [°E]')
 ax1.set_ylabel('Latitude [°N]')
@@ -45,7 +48,8 @@ tick_locator = ticker.MaxNLocator(nbins=10)
 cbar1.locator = tick_locator
 cbar1.update_ticks()
 
-scatter2 = ax2.scatter(lon, lat, c=nano, cmap='viridis')
+# scatter2 = ax2.scatter(lon, lat, c=nano, cmap='viridis')
+scatter2 = ax2.scatter(lon, lat, c=nano, s=[normal_size if i > 13 else normal_size*3.5 for i in range(len(lon))], cmap='viridis')
 ax2.set_title(r'$NANO$' + '\n$f_{BioM}=' + str(round(f_biomass_nano, 1)) + '$')
 ax2.set_xlabel('Longitude [°E]')
 ax2.set_ylabel('Latitude [°N]')
@@ -56,7 +60,8 @@ tick_locator = ticker.MaxNLocator(nbins=10)
 cbar2.locator = tick_locator
 cbar2.update_ticks()
 
-scatter3 = ax3.scatter(lon, lat, c=micro, cmap='viridis')
+# scatter3 = ax3.scatter(lon, lat, c=micro, cmap='viridis')
+scatter3 = ax3.scatter(lon, lat, c=micro, s=[normal_size if i > 13 else normal_size*3.5 for i in range(len(lon))], cmap='viridis')
 ax3.set_title(r'$MICRO$' + '\n$f_{BioM}=' + str(round(f_biomass_micro, 1)) + '$')
 ax3.set_xlabel('Longitude [°E]')
 ax3.set_ylabel('Latitude [°N]')
@@ -67,16 +72,16 @@ tick_locator = ticker.MaxNLocator(nbins=10)
 cbar3.locator = tick_locator
 cbar3.update_ticks()
 
-scatter4 = ax4.scatter(lon, lat, c=tot, cmap='viridis')
-ax4.set_title(r'$TOTAL$')
-ax4.set_xlabel('Longitude [°E]')
-ax4.set_ylabel('Latitude [°N]')
-ax4.set_aspect('equal')
-cbar4 = plt.colorbar(scatter4, ax=ax4, label='Biomass [mmolC m$^{-3}$]')
-ax4.axhline(y=38.5, color='lightcoral', linestyle='-',linewidth=1.5)
-tick_locator = ticker.MaxNLocator(nbins=10)
-cbar4.locator = tick_locator
-cbar4.update_ticks()
+# scatter4 = ax4.scatter(lon, lat, c=tot, cmap='viridis')
+# ax4.set_title(r'$TOTAL$')
+# ax4.set_xlabel('Longitude [°E]')
+# ax4.set_ylabel('Latitude [°N]')
+# ax4.set_aspect('equal')
+# cbar4 = plt.colorbar(scatter4, ax=ax4, label='Biomass [mmolC m$^{-3}$]')
+# ax4.axhline(y=38.5, color='lightcoral', linestyle='-',linewidth=1.5)
+# tick_locator = ticker.MaxNLocator(nbins=10)
+# cbar4.locator = tick_locator
+# cbar4.update_ticks()
 
 plt.tight_layout()
 plt.show()

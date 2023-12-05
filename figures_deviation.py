@@ -28,7 +28,7 @@ for i, test in enumerate(test_values):
     cax = axs[i].matshow(variations_abs, cmap='Spectral')
     axs[i].set_xticks(np.arange(4))
     axs[i].set_yticks(np.arange(len(param_names)))
-    axs[i].set_xticklabels([r'$PO4$', r'$P_1$', r'$P_2$', r'$R$'])
+    axs[i].set_xticklabels([r'$PO_4$', r'$P_1$', r'$P_2$', r'$R$'])
     axs[i].set_yticklabels(param_names)
     axs[i].xaxis.tick_bottom()
     axs[i].set_xlabel('State variable')

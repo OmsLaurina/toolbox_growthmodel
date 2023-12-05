@@ -1,7 +1,7 @@
 """
-
-plot the dynamical-state outputs of the model as a function of the value chosen for the amplitude b.
-
+* Plot the dynamical-state outputs of the model as a function of the value chosen for the amplitude b.
+* The configuration is defined within the "set_up" function in the "set_up.py" script.
+* First you need to create the outputs from the "outputs_dynamicalstate.py" script.
 """
 
 import matplotlib.pyplot as plt
