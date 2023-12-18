@@ -186,8 +186,8 @@ for i, ax in enumerate(axs):
 legend_patches = [mpatches.Patch(color=color, label=param_names2) for color, param_names2 in zip(custom_colors, param_names2)]
 fig.legend(handles=legend_patches, loc='center right', bbox_to_anchor=(1.02, 0.5), frameon=False)
 
-custom_lines = [Line2D([0], [0], color='black', linestyle='dotted', label='half'),
-                Line2D([0], [0], color='black', linestyle='-', label='twice')]
+custom_lines = [Line2D([0], [0], color='black', linestyle='dotted', label='twice (run 3)'),
+                Line2D([0], [0], color='black', linestyle='-', label='half (run 2)')]
 fig.legend(handles=custom_lines, loc='center right', bbox_to_anchor=(1.02, 0.38), frameon=False)
 
 plt.show()

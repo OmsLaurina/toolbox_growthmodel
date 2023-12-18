@@ -37,7 +37,7 @@ ax3 = fig.add_subplot(1, 3, 3) # NANO
 normal_size = 20
 
 # scatter1 = ax1.scatter(lon, lat, c=pico, cmap='viridis')
-scatter1 = ax1.scatter(lon, lat, c=pico, s=[normal_size if i > 13 else normal_size*3.5 for i in range(len(lon))], cmap='viridis')
+scatter1 = ax1.scatter(lon, lat, c=nanored, s=[normal_size if i > 13 else normal_size*3.5 for i in range(len(lon))], cmap='viridis')
 ax1.set_title(r'$PICO$' + '\n$f_{BioM}=' + str(round(f_biomass_syne, 1)) + '$')
 ax1.set_xlabel('Longitude [°E]')
 ax1.set_ylabel('Latitude [°N]')

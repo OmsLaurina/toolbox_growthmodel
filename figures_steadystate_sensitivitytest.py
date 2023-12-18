@@ -130,17 +130,17 @@ arg = {
     'kZ2': 20,
 }
 N_theo_PO4 = np.linspace(0, 6, len(time))
-f_monod(N_theo_PO4, arg['umax1'], arg['kP1'],"chartreuse")
-f_monod(N_theo_PO4, arg['umax2'], arg['kP2'],"green")
+f_monod(N_theo_PO4/130, arg['umax1'], arg['kP1']/130,"chartreuse")
+f_monod(N_theo_PO4/130, arg['umax2'], arg['kP2']/130,"green")
 # f_monod(P_O4, arg['umax1'], arg['kP1'],"gray")
 # f_monod(P_O4, arg['umax2'], arg['kP2'],"lightgray")
-plt.xlabel(r'$PO_4 [mmolC\,m^{-3}d^{-1}$')
+plt.xlabel(r'$PO_4 [mmolP\,m^{-3}]$')
 plt.ylabel(r'$\mu\ [d^{-1}]$')
 plt.ylim(0,2)
-plt.axvline(x=1.378, color='red', linestyle='--', label="[PO4] observed")
-plt.axvline(x=min(P_O4), color='lightcoral', linestyle='--', label="Min PO4")
-plt.axvline(x=max(P_O4), color='lightcoral', linestyle='--', label="Max PO4")
-plt.fill_betweenx(np.linspace(0, max(plt.ylim()), len(l_param)), min(P_O4), max(P_O4), color='red', alpha=0.3, label='Range')
+plt.axvline(x=0.013, color='red', linestyle='--', label="[PO4] observed")
+plt.axvline(x=min(P_O4)/130, color='lightcoral', linestyle='--', label="Min PO4")
+plt.axvline(x=max(P_O4)/130, color='lightcoral', linestyle='--', label="Max PO4")
+plt.fill_betweenx(np.linspace(0, max(plt.ylim()), len(l_param)), min(P_O4)/130, max(P_O4)/130, color='red', alpha=0.3, label='Range')
 
 plt.legend(handles=[plt.Line2D([0], [0], color='chartreuse', label=r'$P_1$'),
                 plt.Line2D([0], [0], color='green', label=r'$P_2$'),

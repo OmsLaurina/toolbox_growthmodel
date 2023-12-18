@@ -41,6 +41,12 @@ pico_high = pico[mask]
 nano_low = nano[~mask]
 nano_high = nano[mask]
 
+nanosws_low = biom_NANOsws[~mask]
+nanosws_high = biom_NANOsws[mask]
+
+nanored_low = biom_NANOred[~mask]
+nanored_high = biom_NANOred[mask]
+
 micro_low = micro[~mask]
 micro_high = micro[mask]
 
@@ -48,6 +54,8 @@ micro_high = micro[mask]
 f_biomass_syne = np.mean(pico_low)/np.mean(pico_high)
 f_biomass_nano = np.mean(nano_low)/np.mean(nano_high)
 f_biomass_micro = np.mean(micro_low)/np.mean(micro_high)
+f_biomass_nanosws = np.mean(nanosws_low)/np.mean(nanosws_high)
+f_biomass_nanored = np.mean(nanored_low)/np.mean(nanored_high)
 factor = np.column_stack((f_biomass_syne,f_biomass_nano,f_biomass_micro))
 
 np.savetxt('../outputs/f_biomass.txt', factor, header = 'f_syne f_nano f_micro')
