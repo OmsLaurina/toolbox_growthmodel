@@ -107,6 +107,9 @@ for param in l_param:
         Z_barre = Z[-1]
         PO4_barre = PO4[-1]
         
+        if P2_barre>P1_barre:
+            print('##################### Dominance threshold:', param)
+        
         if P1_barre > 0 and P2_barre > 0 and Z_barre > 0 and PO4_barre > 0:
             print(f"Équilibre {equilibre} est positif pour param={param}")
         else:

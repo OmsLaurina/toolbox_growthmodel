@@ -55,6 +55,12 @@ for param in l_param:
     P_O4[i] = PO4[len(PO4)-1]
     Z_[i] = Z[len(Z)-1]
     
+    seuil_ratio = 0.05
+
+    if abs(ratio[i] - 0.5) < seuil_ratio:
+        print("Le ratio est proche de 0.5 au millième près.", param, ratio[i])
+        break
+    
     i=i+1
     print(i)
     

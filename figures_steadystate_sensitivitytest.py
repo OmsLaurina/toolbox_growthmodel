@@ -12,6 +12,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import scienceplots
 from f_monod_hollingII import f_monod
 from set_up import set_up_steadystate
+from scipy.signal import savgol_filter
 
 plt.style.use(['science','no-latex'])
 plt.close('all')
@@ -100,11 +101,12 @@ fig = plt.figure(2)
 sc = plt.scatter(l_param, ratio, c=P_1+P_2, cmap='Wistia')
 plt.plot(l_param, ratio, color='black')
 # plt.axvline(x=0.01, color='gray', linestyle='--', linewidth=1.5)
-plt.axvline(x=0.02, color='gray', linestyle=':', linewidth=1.5)
+plt.axvline(x=0.03, color='gray', linestyle=':', linewidth=1.5)
 # plt.axvline(x=0.096, color='gray', linestyle='--', linewidth=1.5)
 
 if grazing == 'diffgrazing':
     plt.axvline(x=0.05, color='red', linestyle='--')
+    # plt.axhline(y=0.5, color='red', linestyle='--')
 
 plt.xlabel(name_param, fontsize=10)
 plt.ylabel('R []', fontsize=10)
@@ -112,6 +114,23 @@ cbar = plt.colorbar(sc, ticks=MaxNLocator(nbins=3))
 cbar.ax.xaxis.set_label_position('top')
 cbar.set_label(r'$P_1+P_2$ [mmolC m$^{-3}$]', labelpad=2)
 plt.yticks([0, 0.25, 0.5, 0.75, 1])
+
+index_ratio_05 = np.argmax(ratio <= 0.5)
+l_param_at_ratio_05 = l_param[index_ratio_05]
+print("Index where ratio is lower than 0.5", index_ratio_05)
+print("l_param corresponding value :", l_param_at_ratio_05)
+
+# # Determine the inflexion point
+# smoothed_curve = savgol_filter(ratio, window_length=5, polyorder=2)
+# smoothed_curve = smoothed_curve[40:70]
+# l_param = l_param[40:70]
+# inflexion_point_index = np.argmax(np.gradient(np.gradient(smoothed_curve)) > 0)
+# inflexion_point = (l_param[inflexion_point_index], smoothed_curve[inflexion_point_index])
+# plt.annotate(f'Inflexion Point\n{name_param}={inflexion_point[0]:.2f}, R={inflexion_point[1]:.2f}',
+#              xy=inflexion_point, xytext=(0.05, 0.75),
+#              arrowprops=dict(facecolor='black', shrink=0.05))
+
+
 plt.savefig(f'../figures/R-ratio_{grazing}.pdf', format='pdf')
 
 

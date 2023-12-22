@@ -8,6 +8,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import ticker
 import scienceplots
+from scipy.interpolate import griddata
+import xarray as xr
+import scipy.io
+from scipy.interpolate import interp2d
+from sklearn.preprocessing import MinMaxScaler
 
 plt.style.use(['science','no-latex'])
 plt.close('all')
@@ -104,3 +109,33 @@ plt.colorbar(label=r'${TotBioM}$ [mmolC m$^{-3}$]')
 plt.xlabel('Latitude [°N]', fontsize=10)
 plt.ylabel(r'$R_{in situ}$ []', fontsize=10)
 plt.savefig('../figures/ratioR_latitude.pdf', format='pdf')
+
+# Same than the previous one but with scatter size depending on chlorophyll
+
+chl_data = scipy.io.loadmat('../BioSWOTmed_data/chl_CLS/nrt_color_swmed_20180510_20180512.mat')
+lon_chl = chl_data['lon'].T
+lat_chl = chl_data['lat'].T
+chl = chl_data['chl']
+
+lat_biomasses = np.loadtxt('../outputs/lat.txt')
+lon_biomasses = np.loadtxt('../outputs/lon.txt')
+
+lon_chl_adjusted, lat_chl_adjusted = np.meshgrid(lon_chl.flatten(), lat_chl.flatten())
+points = np.column_stack((lon_chl_adjusted.flatten(), lat_chl_adjusted.flatten()))
+values = chl.flatten()
+chl_interpolated = griddata(points, values, (lon_biomasses, lat_biomasses), method='linear', fill_value=np.nan)
+
+scaler = MinMaxScaler()
+chl_at_lat_normalized = scaler.fit_transform(chl_interpolated.reshape(-1, 1)).flatten()
+size = chl_at_lat_normalized * 100
+
+plt.figure(3)
+plt.scatter(lat, (pico+nanored)/(micro+pico+nano), c=(pico+micro+nano), cmap='Wistia', s=size)
+plt.plot(x_fit, y_fit, 'k-', label=f'Polynomial Fit (Degree {degree})')
+plt.axvline(x=38.5, color='red', linestyle='--', linewidth=2)
+plt.grid()
+plt.colorbar(label=r'${TotBioM}$ [mmolC m$^{-3}$]')
+plt.xlabel('Latitude [°N]', fontsize=10)
+plt.ylabel(r'$R_{in situ}$ []', fontsize=10)
+plt.savefig('../figures/ratioR_latitude.pdf', format='pdf')
+plt.show()

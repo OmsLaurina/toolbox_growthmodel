@@ -188,7 +188,7 @@ fig.legend(handles=legend_patches, loc='center right', bbox_to_anchor=(1.02, 0.5
 
 custom_lines = [Line2D([0], [0], color='black', linestyle='dotted', label='twice (run 3)'),
                 Line2D([0], [0], color='black', linestyle='-', label='half (run 2)')]
-fig.legend(handles=custom_lines, loc='center right', bbox_to_anchor=(1.02, 0.38), frameon=False)
+fig.legend(handles=custom_lines, loc='center right', bbox_to_anchor=(1.05, 0.42), frameon=False)
 
 plt.show()
 plt.savefig(f'../figures/sensitivity_test_{Psupply_cst}.pdf', format='pdf')

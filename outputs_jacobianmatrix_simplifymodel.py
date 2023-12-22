@@ -154,7 +154,7 @@ for param in l_param:
     if np.all(real_parts < 0):
         print("Le modèle est stable")
     else:
-        print("Le modèle est instable")    
+        print("Le modèle est instable", param)    
     real_parts_matrix = np.vstack(real_parts_list)
     # print("Matrice des parties réelles des valeurs propres :", real_parts_matrix)
     i=i+1
